@@ -1,0 +1,42 @@
+{
+  "name": "@yingyeothon/actor-system",
+  "version": "0.2.0",
+  "description": "A basic actor system only using a queue and a lock.",
+  "keywords": [
+    "actor"
+  ],
+  "author": "jaeyoung.choi <lactrious@gmail.com>",
+  "homepage": "https://toolkit.yyt.life/nodejs/packages/actor-system",
+  "license": "MIT",
+  "main": "lib/index.js",
+  "typings": "lib/index.d.ts",
+  "directories": {
+    "lib": "lib",
+    "test": "__tests__"
+  },
+  "files": [
+    "lib"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/yingyeothon/nodejs-toolkit.git"
+  },
+  "scripts": {
+    "tsc": "tsc",
+    "build": "../../node_modules/.bin/tsc",
+    "test": "../../node_modules/.bin/jest --runInBand --detectOpenHandles"
+  },
+  "bugs": {
+    "url": "https://github.com/yingyeothon/nodejs-toolkit/issues"
+  },
+  "dependencies": {
+    "@yingyeothon/logger": "^0.2.0",
+    "uuid": "^3.3.3"
+  },
+  "devDependencies": {
+    "@types/uuid": "^3.4.6"
+  }
+}
