@@ -29,7 +29,7 @@ class Adder {
   public onCommit = () => (this.state = "committed");
   public onMessage = async ({ delta }: IAdderMessage) => {
     this.value += delta;
-    await sleep(ttl + 1);
+    await sleep(ttl * 1);
   };
 }
 
@@ -63,25 +63,26 @@ test("adder-shift", async () => {
   expect(shiftCount).toEqual(0);
 
   await Actor.tryToProcess(env, {
-    shiftTimeout: ttl
+    aliveMillis: ttl,
+    shiftable: true
   });
   expect(actor.state).toEqual("committed");
   expect(actor.value).toEqual(1);
   expect(shiftCount).toEqual(1);
 
   await Actor.tryToProcess(env, {
-    shiftTimeout: ttl
+    aliveMillis: ttl,
+    shiftable: true
   });
   expect(actor.state).toEqual("committed");
   expect(actor.value).toEqual(2);
   expect(shiftCount).toEqual(2);
 
   await Actor.tryToProcess(env, {
-    shiftTimeout: ttl
+    aliveMillis: ttl,
+    shiftable: true
   });
   expect(actor.state).toEqual("committed");
   expect(actor.value).toEqual(3);
-
-  // No shift because there is no more messages.
-  expect(shiftCount).toEqual(2);
+  expect(shiftCount).toEqual(3);
 });

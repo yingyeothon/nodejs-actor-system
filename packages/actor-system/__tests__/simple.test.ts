@@ -49,11 +49,11 @@ test("adder-simple", async () => {
   expect(adder.state).toBeUndefined();
   expect(adder.value).toEqual(0);
 
-  await Actor.consumeUntil(env, { untilMillis: 0 });
+  await Actor.tryToProcess(env);
   expect(adder.state).toEqual("committed");
   expect(adder.value).toEqual(3);
 
-  await Actor.consumeUntil(env, { untilMillis: 0 });
+  await Actor.tryToProcess(env);
   expect(adder.state).toEqual("committed");
   expect(adder.value).toEqual(3);
 });

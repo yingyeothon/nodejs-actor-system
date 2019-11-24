@@ -48,7 +48,7 @@ testRedis("adder-await", async redis => {
   const orderSet: string[] = [];
   setTimeout(async () => {
     orderSet.push("first");
-    await Actor.consumeUntil(env, { untilMillis: 0 });
+    await Actor.tryToProcess(env, { oneShot: true });
   }, 50);
 
   const wait = await Actor.post(env, {

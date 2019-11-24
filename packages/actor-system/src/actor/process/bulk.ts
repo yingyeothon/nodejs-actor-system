@@ -9,18 +9,17 @@ import {
 import { AwaitPolicy, IAwaiterMeta, IUserMessage } from "../message";
 import { copyAwaiterMeta, maybeAwait } from "./utils";
 
-type BulkEnv<T> = IActorProperty &
-  IActorSubsystem &
+export type ActorBulkEnv<T> = IActorProperty &
+  Pick<IActorSubsystem, "logger" | "queue" | "awaiter"> &
   IActorMessageBulkConsumer<T> &
   IActorOptionalHandler;
 
 export const processInBulkMode = async <T>(
-  env: BulkEnv<T>,
+  env: ActorBulkEnv<T>,
   isAlive: () => boolean
 ) => {
-  const { queue, id, logger = nullLogger, onMessages } = env;
-
-  logger.debug(`actor`, `consume-queue`, id);
+  const { queue, id, logger = nullLogger, onMessages, onError } = env;
+  logger.debug(`actor`, `process-queue-in-bulk`, id);
 
   // Process messages as possible as it can while alive.
   const messageMetas: IAwaiterMeta[] = [];
@@ -32,7 +31,15 @@ export const processInBulkMode = async <T>(
     }
 
     // Step 2. Process messages.
-    await maybeAwait(onMessages(messages.map(message => message.item)));
+    try {
+      logger.debug(`actor`, `process-messages`, id, messages);
+      await maybeAwait(onMessages(messages.map(message => message.item)));
+    } catch (error) {
+      logger.error(`actor`, `process-messages-error`, id, messages, error);
+      if (onError) {
+        await maybeAwait(onError(error));
+      }
+    }
 
     // Copy only meta to reduce memory consumption.
     for (const message of messages) {

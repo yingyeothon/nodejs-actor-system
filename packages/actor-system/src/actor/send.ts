@@ -9,7 +9,7 @@ import { IActorProcessOptions, tryToProcess } from "./process";
  * If there is another thread dedicated this actor, `AwaitPolicy` determines when the function completes.
  *
  * Of course, it will handle messages from other threads if this thread takes an `Actor`,
- * In this case the function elapsed may be longer than we expect, so we need to set `shiftTimeout` properly.
+ * In this case the function elapsed may be longer than we expect, so we need to set `IActorProcessOptions` properly.
  */
 export const send = async <T>(
   env: ActorEnvironment<T>,

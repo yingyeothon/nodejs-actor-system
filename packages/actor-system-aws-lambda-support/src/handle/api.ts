@@ -1,8 +1,8 @@
 import * as Actor from "@yingyeothon/actor-system";
-import { ConsoleLogger, ILogger } from "@yingyeothon/logger";
+import { ILogger, nullLogger } from "@yingyeothon/logger";
 import { APIGatewayProxyEvent, APIGatewayProxyHandler } from "aws-lambda";
 
-const defaultAPIProxyFunctionTimeoutMillis = 6 * 1000;
+const defaultAPIProxyFunctionTimeoutMillis = 5 * 1000;
 
 interface IActorAPIEventHandlerArguments<T> {
   newActorEnv: (
@@ -10,25 +10,30 @@ interface IActorAPIEventHandlerArguments<T> {
     event: APIGatewayProxyEvent
   ) => Actor.ActorEnvironment<T>;
   parseMessage?: (body: string) => T;
-  functionTimeout?: number;
   logger?: ILogger;
-  mode?: "send" | "post";
-  awaitPolicy?: Actor.AwaitPolicy;
+  policy:
+    | {
+        type: "send";
+        messageMeta?: Partial<Actor.IAwaiterMeta>;
+        processOptions?: Partial<Actor.IActorProcessOptions>;
+      }
+    | {
+        type: "post";
+        messageMeta?: Actor.IAwaiterMeta;
+      };
 }
 
 export const handleActorAPIEvent = <T>({
   newActorEnv,
   parseMessage: maybeParseMessage,
-  functionTimeout,
   logger: maybeLogger,
-  mode = "send",
-  awaitPolicy = Actor.AwaitPolicy.Forget
+  policy
 }: IActorAPIEventHandlerArguments<
   T
 >): APIGatewayProxyHandler => async event => {
   const parseMessage =
     maybeParseMessage || ((body: string) => JSON.parse(body) as T);
-  const logger = maybeLogger || new ConsoleLogger();
+  const logger = maybeLogger || nullLogger;
 
   logger.debug(`actor-api-handler`, `handle`, event.path, event.body);
   const actorEnv = newActorEnv(event.path, event);
@@ -55,25 +60,39 @@ export const handleActorAPIEvent = <T>({
   }
 
   logger.debug(`actor-api-handler`, `post-and-process`, actorEnv.id, message);
-  const timeoutMillis =
-    functionTimeout !== undefined
-      ? functionTimeout
-      : defaultAPIProxyFunctionTimeoutMillis;
-
   let processed: any;
-  switch (mode) {
+  switch (policy.type) {
     case "send":
       processed = await Actor.send(
         actorEnv,
-        { item: message, awaitPolicy },
-        { shiftTimeout: timeoutMillis }
+        { ...(policy.messageMeta || {}), item: message },
+        prepareProcessOptions(policy.processOptions)
       );
       break;
     case "post":
-      processed = await Actor.post(actorEnv, { item: message, awaitPolicy });
+      processed = await Actor.post(actorEnv, {
+        ...(policy.messageMeta || {}),
+        item: message
+      });
       break;
   }
 
   logger.debug(`actor-api-handler`, `end-of-handle`, actorEnv.id, processed);
   return { statusCode: 200, body: "OK" };
 };
+
+const prepareProcessOptions = (
+  options?: Actor.IActorProcessOptions
+): Actor.IActorProcessOptions =>
+  options
+    ? {
+        aliveMillis:
+          options.aliveMillis ?? defaultAPIProxyFunctionTimeoutMillis,
+        oneShot: options.oneShot ?? true,
+        shiftable: options.shiftable ?? true
+      }
+    : {
+        aliveMillis: defaultAPIProxyFunctionTimeoutMillis,
+        oneShot: true,
+        shiftable: true
+      };

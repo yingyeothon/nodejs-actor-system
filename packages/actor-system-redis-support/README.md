@@ -4,99 +4,113 @@ The queue and lock implementation using Redis to support `actor-system`.
 
 ## Usage
 
-Using Redis-based queue and lock Instead of In-memory-based one, it can support the actor system in distributed mode. And of course, please keep a state of an actor using a proper repository such as `Redis` or `AWS S3`.
+Using Redis-based queue and lock instead of In-memory-based one, it can support the actor system in distributed mode. And of course, please keep a state of an actor using a proper repository such as `Redis` or `AWS S3`.
+
+### With single consumer
 
 ```typescript
-import { ActorSystem } from "@yingyeothon/actor-system";
-import { RedisLock, RedisQueue } from "@yingyeothon/actor-system-redis-support";
+import * as Actor from "@yingyeothon/actor-system";
+import * as RedisSupport from "@yingyeothon/actor-system-redis-support";
 import { RedisRepository } from "@yingyeothon/repository-redis";
 import * as IORedis from "ioredis";
 
 const redis = new IORedis();
-const sys = new ActorSystem({
-  queue: new RedisQueue({ redis }),
-  lock: new RedisLock({ redis })
-});
-
-interface IModifier {
-  action: "set" | "add";
-  value: number;
-}
-
-interface IState {
-  value: number;
-}
+const subsys: Actor.IActorSubsystem = {
+  queue: new RedisSupport.RedisQueue({ redis }),
+  lock: new RedisSupport.RedisLock({ redis }),
+  awaiter: new RedisSupport.RedisAwaiter({ redis })
+};
 
 // Keep a state using Redis.
 const repo = new RedisRepository({ redis, prefix: "adder:" });
-const adder = sys.spawn<IModifier>("adder-1", newActor =>
-  newActor.on("act", async ({ name, message: { action, value } }) => {
-    // Load a state from Redis.
-    const state = await repo.get<IState>(name);
-    switch (action) {
-      case "set":
-        state.value = value;
-        break;
-      case "add":
-        state.value += value;
-        break;
-    }
-    // Store the updated context to Redis after acted.
-    await repo.set(name, state);
-  })
-);
+class Adder {
+  private value = 0;
 
-const postAdd = async (mod: IModifier) => {
-  await adder.post(mod);
-  await adder.tryToProcess();
-};
+  constructor(public readonly id: string) {}
 
-postAdd({ action: "set", value: 100 });
-postAdd({ action: "add", value: 10 });
-postAdd({ action: "add", value: -20 });
-postAdd({ action: "add", value: -20 });
-sys.despawn(adder.name);
+  // Load a state from Redis.
+  public onPrepare = async () =>
+    (this.value = (await repo.get<number>(`value:${this.id}`)) || 0);
+
+  // Store the updated context to Redis after acted.
+  public onCommit = async () => repo.set(`value:${this.id}`, this.value);
+
+  public onMessage = (message: { delta: number }) => {
+    this.value += message.delta;
+    console.log(`new value is ${this.value}`);
+  };
+}
+
+const env = Actor.newEnv(subsys)(new Adder(`adder-1`));
+Actor.send(env, { item: { delta: 100 } });
+Actor.send(env, { item: { delta: 200 } });
+Actor.send(env, { item: { delta: -500 } });
 ```
 
-We can think it is too tough that loads and stores a state from Redis in everytime. If we can use error-safe `act`-handler and keep an actor to despawn properly in any circumstances, it can use `spawn` and `despawn` event to write more efficient system.
+### With bulk consumer
+
+It can be rewritten using a bulk way.
 
 ```typescript
-const states: { [actorName: string]: IState } = {};
-const adder = sys.spawn<IModifier>("adder-1", newActor =>
-  newActor
-    .on("spawn", async ({ name }) => {
-      // Load a state from Redis and cache it into the in-memory cache.
-      // There is no splitted-brain among distributed instances because
-      // the actor-system ensures there is the only one actor instance.
-      states[name] = await repo.get<IState>(name);
-    })
-    .on("act", async ({ name, message: { action, value } }) => {
-      const state = states[name];
-      switch (action) {
-        case "set":
-          state.value = value;
-          break;
-        case "add":
-          state.value += value;
-          break;
-      }
-    })
-    .on("despawn", async ({ name }) => {
-      // Store a state to Redis and delete it from the in-memory cache.
-      // To store properly, it should be despawned properly via the system object
-      // and please be careful any messages received after despawned would be ignored.
-      await repo.set(name, states[name]);
-      delete states[name];
-    })
-);
+class Adder {
+  constructor(public readonly id: string) {}
+
+  public onMessages = async (messages: Array<{ delta: number }>) => {
+    // Load a state from Redis.
+    let value = (await repo.get<number>(`value:${this.id}`)) || 0;
+
+    // Process all messages in this actor's queue.
+    for (const message of messages) {
+      value += message.delta;
+    }
+
+    // Store the updated context to Redis after acted.
+    await repo.set(`value:${this.id}`, value);
+  };
+}
+
+const env = Actor.newBulkEnv(subsys)(new Adder(`adder-1`));
+Actor.send(env, { item: { delta: 100 } });
+Actor.send(env, { item: { delta: 200 } });
+Actor.send(env, { item: { delta: -500 } });
 ```
 
-The simple scenario that can accept this model is,
+### With dedicated consumer
 
-- call `spawn` method when a client is _connected_ via a socket such as `WebSocket`,
-- post `message`s when a client sends any action messages,
-- call `despawn` method when a client is _disconnected_.
-- And there is no `shiftTimeout` for this.
+We can think it is too tough that loads and stores a state from Redis in everytime. If we can use a dedicated consumer, we can write more efficient system like this.
+
+```typescript
+class Adder {
+  private value = 0;
+
+  constructor(public readonly id: string) {}
+
+  public load = async () =>
+    (this.value = (await repo.get<number>(`value:${this.id}`)) || 0);
+
+  public store = async () => repo.set(`value:${this.id}`, this.value);
+
+  public onMessages = async (messages: Array<{ delta: number }>) => {
+    // Process all messages in this actor's queue.
+    for (const message of messages) {
+      this.value += message.delta;
+    }
+  };
+}
+
+// In consumer context
+const processActor = async (actorId: string) => {
+  const adder = new Adder(actorId);
+  const env = Actor.newBulkEnv(subsys)(adder);
+  await adder.load();
+  await Actor.tryToProcess(env, { aliveMillis: 60 * 1000 });
+  await adder.store();
+};
+await processActor(`adder-1`);
+
+// In producer context
+await Actor.post({ ...subsys, id: `adder-1` }, { item: { delta: 100 } });
+```
 
 ## License
 

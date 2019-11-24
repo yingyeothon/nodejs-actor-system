@@ -54,7 +54,7 @@ test("adder-await", async () => {
   const orderSet: string[] = [];
   setTimeout(async () => {
     orderSet.push("first");
-    await Actor.consumeUntil(env, { untilMillis: 0 });
+    await Actor.tryToProcess(env);
   }, 50);
 
   await Actor.post(env, {

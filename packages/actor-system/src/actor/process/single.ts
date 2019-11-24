@@ -9,15 +9,19 @@ import {
 import { AwaitPolicy, IAwaiterMeta, IUserMessage } from "../message";
 import { copyAwaiterMeta, maybeAwait } from "./utils";
 
-type SingleEnv<T> = IActorProperty &
-  IActorSubsystem &
+export type ActorSingleEnv<T> = IActorProperty &
+  Pick<IActorSubsystem, "logger" | "queue" | "awaiter"> &
   IActorMessageSingleConsumer<T> &
   IActorOptionalHandler;
 
 export const processInSingleMode = async <T>(
-  env: SingleEnv<T>,
+  env: ActorSingleEnv<T>,
   isAlive: () => boolean
 ) => {
+  if (!isAlive()) {
+    return [];
+  }
+
   const { id, onPrepare, onCommit } = env;
 
   // Consume messages in the queue if locked.
@@ -35,12 +39,12 @@ export const processInSingleMode = async <T>(
 };
 
 const processQueueInLock = async <T>(
-  env: SingleEnv<T>,
+  env: ActorSingleEnv<T>,
   isAlive: () => boolean
 ): Promise<IAwaiterMeta[]> => {
   const { queue, id, logger = nullLogger } = env;
 
-  logger.debug(`actor`, `consume-queue`, id);
+  logger.debug(`actor`, `process-queue-in-single`, id);
 
   // Process messages as possible as it can while alive.
   const messageMetas: IAwaiterMeta[] = [];
@@ -77,7 +81,7 @@ const processQueueInLock = async <T>(
 };
 
 const processMessage = async <T>(
-  env: SingleEnv<T>,
+  env: ActorSingleEnv<T>,
   message: IUserMessage<any>
 ): Promise<void> => {
   const { id, logger = nullLogger, onMessage, onError } = env;
