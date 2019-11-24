@@ -1,6 +1,6 @@
 {
   "name": "@yingyeothon/actor-system-redis-support",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "The implementation of queue and lock to support actor-system.",
   "keywords": [
     "actor",
@@ -34,7 +34,7 @@
     "url": "https://github.com/yingyeothon/nodejs-toolkit/issues"
   },
   "dependencies": {
-    "@yingyeothon/actor-system": "^0.2.0",
+    "@yingyeothon/actor-system": "^0.2.1",
     "@yingyeothon/codec": "^0.2.0",
     "@yingyeothon/logger": "^0.2.0",
     "ioredis": "^4.11.2"
