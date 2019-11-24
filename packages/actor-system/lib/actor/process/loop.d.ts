@@ -1,0 +1,3 @@
+import { IActorSubsystem } from "../env";
+import { IAwaiterMeta } from "../message";
+export declare const processLoop: <T>(env: (import("../env").IActorProperty & Pick<IActorSubsystem, "logger" | "awaiter" | "queue"> & import("../env").IActorMessageSingleConsumer<T> & import("../env").IActorOptionalHandler & Pick<IActorSubsystem, "lock">) | (import("../env").IActorProperty & Pick<IActorSubsystem, "logger" | "awaiter" | "queue"> & import("../env").IActorMessageBulkConsumer<T> & import("../env").IActorOptionalHandler & Pick<IActorSubsystem, "lock">), isAlive: () => boolean) => Promise<IAwaiterMeta[]>;

@@ -1,3 +1,3 @@
 export interface IActorLambdaEvent {
-    actorName: string;
+    actorId: string;
 }

@@ -11,10 +11,10 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", { value: true });
 const Actor = require("@yingyeothon/actor-system");
 const logger_1 = require("@yingyeothon/logger");
-const defaultAPIProxyFunctionTimeoutMillis = 6 * 1000;
-exports.handleActorAPIEvent = ({ newActorEnv, parseMessage: maybeParseMessage, functionTimeout, logger: maybeLogger, mode = "send", awaitPolicy = Actor.AwaitPolicy.Forget }) => (event) => __awaiter(void 0, void 0, void 0, function* () {
+const defaultAPIProxyFunctionTimeoutMillis = 5 * 1000;
+exports.handleActorAPIEvent = ({ newActorEnv, parseMessage: maybeParseMessage, logger: maybeLogger, policy }) => (event) => __awaiter(void 0, void 0, void 0, function* () {
     const parseMessage = maybeParseMessage || ((body) => JSON.parse(body));
-    const logger = maybeLogger || new logger_1.ConsoleLogger();
+    const logger = maybeLogger || logger_1.nullLogger;
     logger.debug(`actor-api-handler`, `handle`, event.path, event.body);
     const actorEnv = newActorEnv(event.path, event);
     if (!actorEnv) {
@@ -31,19 +31,30 @@ exports.handleActorAPIEvent = ({ newActorEnv, parseMessage: maybeParseMessage, f
         throw new Error(`Invalid message for actor[${actorEnv.id}]`);
     }
     logger.debug(`actor-api-handler`, `post-and-process`, actorEnv.id, message);
-    const timeoutMillis = functionTimeout !== undefined
-        ? functionTimeout
-        : defaultAPIProxyFunctionTimeoutMillis;
     let processed;
-    switch (mode) {
+    switch (policy.type) {
         case "send":
-            processed = yield Actor.send(actorEnv, { item: message, awaitPolicy }, { shiftTimeout: timeoutMillis });
+            processed = yield Actor.send(actorEnv, Object.assign(Object.assign({}, (policy.messageMeta || {})), { item: message }), prepareProcessOptions(policy.processOptions));
             break;
         case "post":
-            processed = yield Actor.post(actorEnv, { item: message, awaitPolicy });
+            processed = yield Actor.post(actorEnv, Object.assign(Object.assign({}, (policy.messageMeta || {})), { item: message }));
             break;
     }
     logger.debug(`actor-api-handler`, `end-of-handle`, actorEnv.id, processed);
     return { statusCode: 200, body: "OK" };
 });
+const prepareProcessOptions = (options) => {
+    var _a, _b, _c;
+    return options
+        ? {
+            aliveMillis: (_a = options.aliveMillis, (_a !== null && _a !== void 0 ? _a : defaultAPIProxyFunctionTimeoutMillis)),
+            oneShot: (_b = options.oneShot, (_b !== null && _b !== void 0 ? _b : true)),
+            shiftable: (_c = options.shiftable, (_c !== null && _c !== void 0 ? _c : true))
+        }
+        : {
+            aliveMillis: defaultAPIProxyFunctionTimeoutMillis,
+            oneShot: true,
+            shiftable: true
+        };
+};
 //# sourceMappingURL=api.js.map

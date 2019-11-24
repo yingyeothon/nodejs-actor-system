@@ -13,30 +13,24 @@ const Actor = require("@yingyeothon/actor-system");
 const logger_1 = require("@yingyeothon/logger");
 const aws_sdk_1 = require("aws-sdk");
 const time_1 = require("./time");
-const defaultLambdaFunctionTimeoutMillis = 14 * 60 * 1000;
-exports.handleActorLambdaEvent = ({ newActorEnv, functionTimeout = defaultLambdaFunctionTimeoutMillis, logger: maybeLogger, aliveMode = "tryToProcess" }) => (event) => __awaiter(void 0, void 0, void 0, function* () {
-    time_1.globalTimeline.reset(functionTimeout);
-    const logger = maybeLogger || new logger_1.ConsoleLogger();
-    logger.debug(`actor-lambda`, `handle`, aliveMode, event);
+const defaultLambdaFunctionTimeoutMillis = 870 * 1000;
+exports.handleActorLambdaEvent = ({ newActorEnv, logger: maybeLogger, processOptions }) => (event) => __awaiter(void 0, void 0, void 0, function* () {
+    var _a;
+    time_1.globalTimeline.reset(((_a = processOptions) === null || _a === void 0 ? void 0 : _a.aliveMillis) || defaultLambdaFunctionTimeoutMillis);
+    const logger = maybeLogger || logger_1.nullLogger;
+    logger.debug(`actor-lambda`, `handle`, processOptions, event);
     const env = newActorEnv(event);
     if (!env) {
         throw new Error(`No actor env [${event}]`);
     }
-    switch (aliveMode) {
-        case "tryToProcess":
-            yield Actor.tryToProcess(env, {
-                shiftTimeout: time_1.globalTimeline.remainMillis
-            });
-            break;
-        case "consumeUntil":
-            yield Actor.consumeUntil(env, {
-                untilMillis: time_1.globalTimeline.remainMillis
-            });
-            break;
-    }
-    logger.debug(`actor-lambda`, `end-of-handle`, aliveMode, event);
+    yield Actor.tryToProcess(env, processOptions || {
+        aliveMillis: time_1.globalTimeline.remainMillis,
+        oneShot: true,
+        shiftable: true
+    });
+    logger.debug(`actor-lambda`, `end-of-handle`, processOptions, event);
 });
-exports.shiftToNextLambda = ({ functionName, functionVersion, buildPayload = actorName => ({ actorName }) }) => actorId => new aws_sdk_1.Lambda()
+exports.shiftToNextLambda = ({ functionName, functionVersion, buildPayload = actorId => ({ actorId }) }) => actorId => new aws_sdk_1.Lambda()
     .invoke({
     FunctionName: functionName,
     InvocationType: "Event",

@@ -14,6 +14,9 @@ const awaiter_1 = require("../awaiter");
 const message_1 = require("../message");
 const utils_1 = require("./utils");
 exports.processInSingleMode = (env, isAlive) => __awaiter(void 0, void 0, void 0, function* () {
+    if (!isAlive()) {
+        return [];
+    }
     const { id, onPrepare, onCommit } = env;
     if (onPrepare) {
         yield utils_1.maybeAwait(onPrepare(id));
@@ -26,7 +29,7 @@ exports.processInSingleMode = (env, isAlive) => __awaiter(void 0, void 0, void 0
 });
 const processQueueInLock = (env, isAlive) => __awaiter(void 0, void 0, void 0, function* () {
     const { queue, id, logger = logger_1.nullLogger } = env;
-    logger.debug(`actor`, `consume-queue`, id);
+    logger.debug(`actor`, `process-queue-in-single`, id);
     const messageMetas = [];
     const notifyPromises = [];
     while (isAlive() && (yield queue.size(id)) > 0) {

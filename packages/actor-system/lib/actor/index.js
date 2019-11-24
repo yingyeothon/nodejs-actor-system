@@ -7,6 +7,5 @@ __export(require("./env"));
 __export(require("./message"));
 __export(require("./send"));
 __export(require("./post"));
-__export(require("./consume"));
 __export(require("./process"));
 //# sourceMappingURL=index.js.map

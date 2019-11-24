@@ -1,3 +1,5 @@
 export interface IActorProcessOptions {
-    shiftTimeout?: number;
+    oneShot?: boolean;
+    aliveMillis?: number;
+    shiftable?: boolean;
 }

@@ -4,10 +4,15 @@ import { APIGatewayProxyEvent } from "aws-lambda";
 interface IActorAPIEventHandlerArguments<T> {
     newActorEnv: (apiPath: string, event: APIGatewayProxyEvent) => Actor.ActorEnvironment<T>;
     parseMessage?: (body: string) => T;
-    functionTimeout?: number;
     logger?: ILogger;
-    mode?: "send" | "post";
-    awaitPolicy?: Actor.AwaitPolicy;
+    policy: {
+        type: "send";
+        messageMeta?: Partial<Actor.IAwaiterMeta>;
+        processOptions?: Partial<Actor.IActorProcessOptions>;
+    } | {
+        type: "post";
+        messageMeta?: Actor.IAwaiterMeta;
+    };
 }
-export declare const handleActorAPIEvent: <T>({ newActorEnv, parseMessage: maybeParseMessage, functionTimeout, logger: maybeLogger, mode, awaitPolicy }: IActorAPIEventHandlerArguments<T>) => import("aws-lambda").Handler<APIGatewayProxyEvent, import("aws-lambda").APIGatewayProxyResult>;
+export declare const handleActorAPIEvent: <T>({ newActorEnv, parseMessage: maybeParseMessage, logger: maybeLogger, policy }: IActorAPIEventHandlerArguments<T>) => import("aws-lambda").Handler<APIGatewayProxyEvent, import("aws-lambda").APIGatewayProxyResult>;
 export {};

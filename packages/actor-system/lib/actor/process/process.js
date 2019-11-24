@@ -10,53 +10,30 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const logger_1 = require("@yingyeothon/logger");
-const awaiter_1 = require("../awaiter");
-const message_1 = require("../message");
-const bulk_1 = require("./bulk");
-const single_1 = require("./single");
+const loop_1 = require("./loop");
 const utils_1 = require("./utils");
-exports.tryToProcess = (env, { shiftTimeout } = {}) => __awaiter(void 0, void 0, void 0, function* () {
+exports.tryToProcess = (env, { oneShot, aliveMillis, shiftable } = {}) => __awaiter(void 0, void 0, void 0, function* () {
+    const { logger = logger_1.nullLogger, id, shift } = env;
+    const maybeOneShot = oneShot === undefined && aliveMillis === undefined;
     const startMillis = Date.now();
-    const isAlive = () => shiftTimeout && shiftTimeout > 0
-        ? Date.now() - startMillis < shiftTimeout
+    const isAlive = () => aliveMillis && aliveMillis > 0
+        ? Date.now() - startMillis < aliveMillis
         : true;
-    return exports.processLoop(env, isAlive);
-});
-exports.processLoop = (env, isAlive) => __awaiter(void 0, void 0, void 0, function* () {
-    const { id, queue, lock, logger = logger_1.nullLogger, shift } = env;
-    const messageMetas = [];
-    logger.debug(`actor`, `consume-loop`, id);
-    while (true) {
-        logger.debug(`actor`, `try-to-lock`, id);
-        if (!(yield lock.tryAcquire(id))) {
-            logger.debug(`actor`, `cannot-lock`, id);
-            break;
-        }
-        let localMetas = [];
-        switch (env._consume) {
-            case "single":
-                localMetas = yield single_1.processInSingleMode(env, isAlive);
-                break;
-            case "bulk":
-                localMetas = yield bulk_1.processInBulkMode(env, isAlive);
-                break;
-        }
-        Array.prototype.push.apply(messageMetas, localMetas);
-        logger.debug(`actor`, `release-lock`, id);
-        yield lock.release(id);
-        yield awaiter_1.notifyCompletions(env, messageMetas.filter(meta => meta.awaitPolicy === message_1.AwaitPolicy.Commit));
-        if ((yield queue.size(id)) === 0) {
-            logger.debug(`actor`, `empty-queue`, id);
-            break;
-        }
-        if (!isAlive()) {
+    const metas = [];
+    while (isAlive()) {
+        const localMetas = yield loop_1.processLoop(env, isAlive);
+        Array.prototype.push.apply(metas, localMetas);
+        if (!isAlive() && shiftable) {
             logger.debug(`actor`, `shift-timeout`, id);
             if (shift) {
                 yield utils_1.maybeAwait(shift(id));
             }
             break;
         }
+        if (oneShot || maybeOneShot) {
+            break;
+        }
     }
-    return messageMetas;
+    return metas;
 });
 //# sourceMappingURL=process.js.map
