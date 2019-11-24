@@ -6,7 +6,7 @@ const isRedisNotSupported = () =>
 const redisWork = async (cb: (redis: IORedis.Redis) => Promise<any>) => {
   if (isRedisNotSupported()) {
     console.log(`No test env: TEST_REDIS_PORT, TEST_REDIS_HOST`);
-    return null;
+    return;
   }
   const redis = new IORedis(
     +process.env.TEST_REDIS_PORT!,

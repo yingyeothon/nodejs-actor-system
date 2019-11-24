@@ -37,6 +37,11 @@ export const handleActorAPIEvent = <T>({
     throw new Error(`No actor env for [${event.path}]`);
   }
 
+  if (!event.body) {
+    logger.error(`actor-api-handler`, `no-actor-message`, event);
+    throw new Error(`No message body for [${event.path}]`);
+  }
+
   const message = parseMessage(event.body);
   if (!message) {
     logger.error(

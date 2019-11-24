@@ -6,7 +6,7 @@
     "actor"
   ],
   "author": "jaeyoung.choi <lactrious@gmail.com>",
-  "homepage": "https://toolkit.yyt.life/nodejs/packages/actor-system",
+  "homepage": "https://github.com/yingyeothon/nodejs-actor-system/tree/master/packages/actor-system",
   "license": "MIT",
   "main": "lib/index.js",
   "typings": "lib/index.d.ts",

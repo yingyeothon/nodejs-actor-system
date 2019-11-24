@@ -7,7 +7,7 @@
     "redis"
   ],
   "author": "jaeyoung.choi <lactrious@gmail.com>",
-  "homepage": "https://toolkit.yyt.life/nodejs/packages/actor-system-redis-support",
+  "homepage": "https://github.com/yingyeothon/nodejs-actor-system/tree/master/packages/actor-system-redis-support",
   "license": "MIT",
   "main": "lib/index.js",
   "typings": "lib/index.d.ts",

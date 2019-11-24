@@ -13,7 +13,9 @@ export const tryToProcess = async <T>(
 ): Promise<IAwaiterMeta[]> => {
   const startMillis = Date.now();
   const isAlive = () =>
-    shiftTimeout > 0 ? Date.now() - startMillis < shiftTimeout : true;
+    shiftTimeout && shiftTimeout > 0
+      ? Date.now() - startMillis < shiftTimeout
+      : true;
 
   return processLoop(env, isAlive);
 };

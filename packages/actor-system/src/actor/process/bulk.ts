@@ -1,5 +1,5 @@
 import { nullLogger } from "@yingyeothon/logger";
-import { notifyCompletion, notifyCompletions } from "../awaiter";
+import { notifyCompletions } from "../awaiter";
 import {
   IActorMessageBulkConsumer,
   IActorOptionalHandler,

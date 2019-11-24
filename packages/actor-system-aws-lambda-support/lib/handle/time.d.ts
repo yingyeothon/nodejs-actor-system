@@ -2,8 +2,8 @@ export declare class Timeline {
     epochMillis: number;
     timeoutMillis: number;
     reset(timeoutMillis?: number): void;
-    readonly passedMillis: number;
-    readonly remainMillis: number;
-    readonly over: boolean;
+    get passedMillis(): number;
+    get remainMillis(): number;
+    get over(): boolean;
 }
 export declare const globalTimeline: Timeline;

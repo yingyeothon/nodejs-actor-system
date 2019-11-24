@@ -1,9 +1,10 @@
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
         function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
         function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : new P(function (resolve) { resolve(result.value); }).then(fulfilled, rejected); }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
@@ -14,12 +15,14 @@ const message_1 = require("../message");
 const bulk_1 = require("./bulk");
 const single_1 = require("./single");
 const utils_1 = require("./utils");
-exports.tryToProcess = (env, { shiftTimeout } = {}) => __awaiter(this, void 0, void 0, function* () {
+exports.tryToProcess = (env, { shiftTimeout } = {}) => __awaiter(void 0, void 0, void 0, function* () {
     const startMillis = Date.now();
-    const isAlive = () => shiftTimeout > 0 ? Date.now() - startMillis < shiftTimeout : true;
+    const isAlive = () => shiftTimeout && shiftTimeout > 0
+        ? Date.now() - startMillis < shiftTimeout
+        : true;
     return exports.processLoop(env, isAlive);
 });
-exports.processLoop = (env, isAlive) => __awaiter(this, void 0, void 0, function* () {
+exports.processLoop = (env, isAlive) => __awaiter(void 0, void 0, void 0, function* () {
     const { id, queue, lock, logger = logger_1.nullLogger, shift } = env;
     const messageMetas = [];
     logger.debug(`actor`, `consume-loop`, id);
