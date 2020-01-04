@@ -1,8 +1,9 @@
-import { IAwaiter } from "../../awaiter";
+import IAwaiterResolve from "../../awaiter/resolve";
+import IAwaiterWait from "../../awaiter/wait";
 
 type BooleanResolver = (result: boolean) => void;
 
-export class InMemoryAwaiter implements IAwaiter {
+export default class InMemoryAwaiter implements IAwaiterWait, IAwaiterResolve {
   private resolvers: { [id: string]: BooleanResolver } = {};
 
   public async wait(

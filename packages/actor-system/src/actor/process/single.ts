@@ -1,23 +1,27 @@
 import { nullLogger } from "@yingyeothon/logger";
-import { notifyCompletion } from "../awaiter";
-import {
-  IActorMessageSingleConsumer,
-  IActorOptionalHandler,
-  IActorProperty,
-  IActorSubsystem
-} from "../env";
-import { AwaitPolicy, IAwaiterMeta, IUserMessage } from "../message";
+import IAwaiterResolve from "../../awaiter/resolve";
+import IQueueLength from "../../queue/length";
+import IQueueSingleConsumer from "../../queue/singleConsumer";
+import notifyCompletion from "../awaiter/notifyCompletion";
+import IActorErrorHandler from "../env/errorHandler";
+import IActorLogger from "../env/logger";
+import IActorProperty from "../env/property";
+import IActorSingleMessageHandler from "../env/singleMessageHandler";
+import IAwaiterMeta from "../message/awaiterMeta";
+import AwaitPolicy from "../message/awaitPolicy";
+import IUserMessage from "../message/userMessage";
 import { copyAwaiterMeta, maybeAwait } from "./utils";
 
 export type ActorSingleEnv<T> = IActorProperty &
-  Pick<IActorSubsystem, "logger" | "queue" | "awaiter"> &
-  IActorMessageSingleConsumer<T> &
-  IActorOptionalHandler;
+  IActorLogger & { queue: IQueueSingleConsumer & IQueueLength } & {
+    awaiter: IAwaiterResolve;
+  } & IActorSingleMessageHandler<T> &
+  IActorErrorHandler;
 
-export const processInSingleMode = async <T>(
+export default async function processInSingleMode<T>(
   env: ActorSingleEnv<T>,
   isAlive: () => boolean
-) => {
+) {
   if (!isAlive()) {
     return [];
   }
@@ -36,7 +40,7 @@ export const processInSingleMode = async <T>(
     await maybeAwait(onCommit(id));
   }
   return localMetas;
-};
+}
 
 const processQueueInLock = async <T>(
   env: ActorSingleEnv<T>,

@@ -1,14 +1,20 @@
 import { nullLogger } from "@yingyeothon/logger";
-import { notifyCompletions } from "../awaiter";
-import { IActorSubsystem } from "../env";
-import { AwaitPolicy, IAwaiterMeta } from "../message";
-import { ActorBulkEnv, processInBulkMode } from "./bulk";
-import { ActorSingleEnv, processInSingleMode } from "./single";
+import ILockRelease from "../../lock/release";
+import ILockAcquire from "../../lock/tryAcquire";
+import notifyCompletions from "../awaiter/notifyCompletions";
+import IAwaiterMeta from "../message/awaiterMeta";
+import AwaitPolicy from "../message/awaitPolicy";
+import processInBulkMode, { ActorBulkEnv } from "./bulk";
+import processInSingleMode, { ActorSingleEnv } from "./single";
 
-export const processLoop = async <T>(
-  env: (ActorSingleEnv<T> | ActorBulkEnv<T>) & Pick<IActorSubsystem, "lock">,
+export type ActorLoopEnvironment<T> = (ActorSingleEnv<T> | ActorBulkEnv<T>) & {
+  lock: ILockAcquire & ILockRelease;
+};
+
+export default async function processLoop<T>(
+  env: ActorLoopEnvironment<T>,
   isAlive: () => boolean
-): Promise<IAwaiterMeta[]> => {
+): Promise<IAwaiterMeta[]> {
   const { id, queue, lock, logger = nullLogger } = env;
 
   const messageMetas: IAwaiterMeta[] = [];
@@ -53,4 +59,4 @@ export const processLoop = async <T>(
     // because there is another message and it is alive.
   }
   return messageMetas;
-};
+}

@@ -1,14 +1,18 @@
 import { nullLogger } from "@yingyeothon/logger";
-import { ActorEnvironment } from "../env";
-import { IAwaiterMeta } from "../message";
-import { processLoop } from "./loop";
-import { IActorProcessOptions } from "./options";
-import { maybeAwait } from "./utils";
+import ActorShifter from "../shift";
+import IAwaiterMeta from "./message/awaiterMeta";
+import processLoop, { ActorLoopEnvironment } from "./process/loop";
+import IActorProcessOptions from "./process/options";
+import { maybeAwait } from "./process/utils";
 
-export const tryToProcess = async <T>(
-  env: ActorEnvironment<T>,
+export type ActorProcessEnvironment<T> = ActorLoopEnvironment<T> & {
+  shift?: ActorShifter;
+};
+
+export default async function tryToProcess<T>(
+  env: ActorProcessEnvironment<T>,
   { oneShot, aliveMillis, shiftable }: IActorProcessOptions = {}
-): Promise<IAwaiterMeta[]> => {
+): Promise<IAwaiterMeta[]> {
   const { logger = nullLogger, id, shift } = env;
   const maybeOneShot = oneShot === undefined && aliveMillis === undefined;
 
@@ -37,4 +41,4 @@ export const tryToProcess = async <T>(
     }
   }
   return metas;
-};
+}

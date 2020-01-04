@@ -26,7 +26,7 @@ class Adder {
   };
 }
 
-const env = Actor.newEnv(subsys)(new Adder(`adder-1`));
+const env = { ...Actor.singleConsumer, ...subsys, ...new Adder(`adder-1`) };
 
 // `send` means that produces a message to an actor and try to process it if it is possible.
 // If other thread attaches this actor, it would process my message, too.
@@ -75,7 +75,7 @@ class Adder {
   };
 }
 
-const env = Actor.newEnv(subsys)(new Adder(`adder-1`));
+const env = { ...Actor.singleConsumer, ...subsys, ...new Adder(`adder-1`) };
 Actor.send(env, {
   item: { delta: 10 },
   awaitPolicy: Actor.AwaitPolicy.Commit,
@@ -90,8 +90,34 @@ Actor.send(env, {
 Sometimes, we want to use fire-and-forget producer and dedicated consumer to improve overall latency. And, in this case, _bulk-message-handler_ is better than _single-message-handler_.
 
 ```typescript
-// Producer needs only actor's `id` with the subsystem.
-Actor.post({ ...subsys, id: `adder-1` }, { item: { delta: 10 } })
+// To reduce code size, use an environment tailored to `post`.
+await Actor.post(
+  {
+    id: `adder-1`,
+    awaiter: {
+      wait: subsys.awaiter.wait
+    },
+    queue: {
+      push: subsys.queue.push
+    },
+    logger: subsys.logger // optional
+  },
+  { item: { delta: 10 } }
+)
+  .then(/* HAPPY */)
+  .catch(/* SAD */);
+
+// Or you can use `enqueue`, which doesn't even need `awaiter`.
+Actor.enqueue(
+  {
+    id: adder.id,
+    queue: {
+      push: actorSubsys.queue.push
+    },
+    logger: actorSubsys.logger // optional
+  },
+  { item: { delta: 1 } }
+)
   .then(/* HAPPY */)
   .catch(/* SAD */);
 ```
@@ -111,7 +137,7 @@ class Adder {
 }
 
 // This `bulk` processor would be alive in 60 seconds.
-const env = Actor.newBulkEnv(subsys)(new Adder(`adder-1`));
+const env = { ...Actor.bulkConsumer, ...subsys, ...new Adder(`adder-1`) };
 Actor.tryToProcess(env, { aliveMillis: 60 * 1000 });
 ```
 
@@ -127,7 +153,7 @@ const subsysWithShift = {
   }
 };
 
-const env = Actor.newEnv(subsys)(new Adder(`adder-shift`));
+const env = { ...Actor.singleConsumer, ...subsys, ...new Adder(`adder-shift`) };
 Actor.send(
   env,
   {

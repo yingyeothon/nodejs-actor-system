@@ -1,4 +1,4 @@
-import { IAwaiterMeta } from "../message";
+import IAwaiterMeta from "../message/awaiterMeta";
 
 export const maybeAwait = async (result: Promise<any> | any) => {
   if (!result) {

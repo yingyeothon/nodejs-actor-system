@@ -1,6 +1,7 @@
-import { ILock } from "../../lock";
+import ILockRelease from "../../lock/release";
+import ILockAcquire from "../../lock/tryAcquire";
 
-export class InMemoryLock implements ILock {
+export default class InMemoryLock implements ILockRelease, ILockAcquire {
   private readonly lockHolders = new Set<string>();
 
   public async tryAcquire(actorId: string) {

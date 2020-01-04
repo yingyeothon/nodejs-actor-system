@@ -10,12 +10,12 @@ interface IAdderMessage {
   delta: number;
 }
 
-const withInMemoryActor = Actor.newEnv({
+const actorSubsys = {
   queue: new InMemoryQueue(),
   lock: new InMemoryLock(),
   awaiter: new InMemoryAwaiter(),
   logger: new ConsoleLogger(`debug`)
-});
+};
 
 class Adder {
   public value: number = 0;
@@ -32,7 +32,11 @@ class Adder {
 
 test("adder-await", async () => {
   const adder = new Adder("adder");
-  const env = withInMemoryActor(adder);
+  const env = {
+    ...Actor.singleConsumer,
+    ...actorSubsys,
+    ...adder
+  };
 
   expect(adder.state).toBeUndefined();
   expect(adder.value).toEqual(0);

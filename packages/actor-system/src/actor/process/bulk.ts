@@ -1,23 +1,27 @@
 import { nullLogger } from "@yingyeothon/logger";
-import { notifyCompletions } from "../awaiter";
-import {
-  IActorMessageBulkConsumer,
-  IActorOptionalHandler,
-  IActorProperty,
-  IActorSubsystem
-} from "../env";
-import { AwaitPolicy, IAwaiterMeta, IUserMessage } from "../message";
+import IAwaiterResolve from "../../awaiter/resolve";
+import IQueueBulkConsumer from "../../queue/bulkConsumer";
+import IQueueLength from "../../queue/length";
+import notifyCompletions from "../awaiter/notifyCompletions";
+import IActorBulkMessageHandler from "../env/bulkMessageHandler";
+import IActorErrorHandler from "../env/errorHandler";
+import IActorLogger from "../env/logger";
+import IActorProperty from "../env/property";
+import IAwaiterMeta from "../message/awaiterMeta";
+import AwaitPolicy from "../message/awaitPolicy";
+import IUserMessage from "../message/userMessage";
 import { copyAwaiterMeta, maybeAwait } from "./utils";
 
 export type ActorBulkEnv<T> = IActorProperty &
-  Pick<IActorSubsystem, "logger" | "queue" | "awaiter"> &
-  IActorMessageBulkConsumer<T> &
-  IActorOptionalHandler;
+  IActorLogger & { queue: IQueueBulkConsumer & IQueueLength } & {
+    awaiter: IAwaiterResolve;
+  } & IActorBulkMessageHandler<T> &
+  IActorErrorHandler;
 
-export const processInBulkMode = async <T>(
+export default async function processInBulkMode<T>(
   env: ActorBulkEnv<T>,
   isAlive: () => boolean
-) => {
+) {
   const { queue, id, logger = nullLogger, onMessages, onError } = env;
   logger.debug(`actor`, `process-queue-in-bulk`, id);
 
@@ -53,4 +57,4 @@ export const processInBulkMode = async <T>(
     );
   }
   return messageMetas;
-};
+}

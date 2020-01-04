@@ -1,17 +1,17 @@
 import { nullLogger } from "@yingyeothon/logger";
 import { v4 as uuidv4 } from "uuid";
-import { IActorProperty, IActorSubsystem } from "./env";
-import {
-  AwaitPolicy,
-  IUserMessage,
-  IUserMessageItem,
-  IUserMessageMeta
-} from "./message";
+import IQueueProducer from "../queue/producer";
+import IActorLogger from "./env/logger";
+import IActorProperty from "./env/property";
+import AwaitPolicy from "./message/awaitPolicy";
+import IUserMessage from "./message/userMessage";
+import IUserMessageItem from "./message/userMessageItem";
+import IUserMessageMeta from "./message/userMessageMeta";
 
-export const enqueue = async <T>(
-  env: Pick<IActorProperty, "id"> & Pick<IActorSubsystem, "queue" | "logger">,
+export default async function enqueue<T>(
+  env: IActorProperty & IActorLogger & { queue: IQueueProducer },
   input: IUserMessageItem<T> & Partial<IUserMessageMeta>
-): Promise<IUserMessage<T>> => {
+): Promise<IUserMessage<T>> {
   const { id, queue, logger = nullLogger } = env;
   const message: IUserMessage<T> = {
     messageId: input.messageId || uuidv4(),
@@ -23,4 +23,4 @@ export const enqueue = async <T>(
   await queue.push(id, message);
   logger.debug(`actor`, `enqueue`, id, message);
   return message;
-};
+}

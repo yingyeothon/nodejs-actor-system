@@ -1,41 +1,49 @@
-import { IQueue } from "../../queue";
+import IQueueBulkConsumer from "../../queue/bulkConsumer";
+import IQueueLength from "../../queue/length";
+import IQueueProducer from "../../queue/producer";
+import IQueueSingleConsumer from "../../queue/singleConsumer";
 
-export class InMemoryQueue implements IQueue {
+export default class InMemoryQueue
+  implements
+    IQueueLength,
+    IQueueProducer,
+    IQueueSingleConsumer,
+    IQueueBulkConsumer {
   private readonly queues: {
     [actorId: string]: any[];
   } = {};
 
-  public async size(actorId: string) {
+  public size = async (actorId: string) => {
     return this.queues[actorId] ? this.queues[actorId].length : 0;
-  }
+  };
 
-  public async push<T>(actorId: string, item: T) {
+  public push = async <T>(actorId: string, item: T) => {
     if (!this.queues[actorId]) {
       this.queues[actorId] = [];
     }
     this.queues[actorId].push(item);
-  }
+  };
 
-  public async pop<T>(actorId: string): Promise<T | null> {
+  public pop = async <T>(actorId: string): Promise<T | null> => {
     if (!this.queues[actorId] || this.queues[actorId].length === 0) {
       return null;
     }
     return this.queues[actorId].shift();
-  }
+  };
 
-  public async peek<T>(actorId: string): Promise<T | null> {
+  public peek = async <T>(actorId: string): Promise<T | null> => {
     if (!this.queues[actorId] || this.queues[actorId].length === 0) {
       return null;
     }
     return this.queues[actorId][0];
-  }
+  };
 
-  public async flush<T>(actorId: string): Promise<T[]> {
+  public flush = async <T>(actorId: string): Promise<T[]> => {
     if (!this.queues[actorId] || this.queues[actorId].length === 0) {
       return [];
     }
     const elements = [...this.queues[actorId]];
     delete this.queues[actorId];
     return elements;
-  }
+  };
 }

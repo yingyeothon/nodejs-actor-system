@@ -10,12 +10,12 @@ interface IAdderMessage {
   delta: number;
 }
 
-const withInMemoryActor = Actor.newEnv({
+const actorSubsys = {
   queue: new InMemoryQueue(),
   lock: new InMemoryLock(),
   awaiter: new InMemoryAwaiter(),
   logger: new ConsoleLogger(`debug`)
-});
+};
 
 const ttl = 50;
 
@@ -38,10 +38,14 @@ const sleep = (millis: number) =>
 
 test("adder-shift", async () => {
   const actor = new Adder("adder");
-  const env = withInMemoryActor(actor);
 
   let shiftCount = 0;
-  env.shift = () => ++shiftCount;
+  const env = {
+    ...Actor.singleConsumer,
+    ...actorSubsys,
+    ...actor,
+    shift: () => ++shiftCount
+  };
 
   expect(actor.state).toBeUndefined();
   expect(actor.value).toEqual(0);
