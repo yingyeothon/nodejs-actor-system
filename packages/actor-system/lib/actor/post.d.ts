@@ -1,3 +1,11 @@
-import { IActorProperty, IActorSubsystem } from "./env";
-import { IUserMessageItem, IUserMessageMeta } from "./message";
-export declare const post: <T>(env: Pick<IActorProperty, "id"> & Pick<IActorSubsystem, "logger" | "awaiter" | "queue">, input: IUserMessageItem<T> & Partial<IUserMessageMeta>) => Promise<boolean>;
+import IAwaiterWait from "../awaiter/wait";
+import IQueueProducer from "../queue/producer";
+import IActorLogger from "./env/logger";
+import IActorProperty from "./env/property";
+import IUserMessageItem from "./message/userMessageItem";
+import IUserMessageMeta from "./message/userMessageMeta";
+export default function post<T>(env: IActorProperty & IActorLogger & {
+    queue: IQueueProducer;
+} & {
+    awaiter: IAwaiterWait;
+}, input: IUserMessageItem<T> & Partial<IUserMessageMeta>): Promise<boolean>;

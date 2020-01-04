@@ -28,5 +28,5 @@ class InMemoryLock {
         });
     }
 }
-exports.InMemoryLock = InMemoryLock;
+exports.default = InMemoryLock;
 //# sourceMappingURL=lock.js.map

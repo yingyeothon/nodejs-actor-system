@@ -12,38 +12,28 @@ Object.defineProperty(exports, "__esModule", { value: true });
 class InMemoryQueue {
     constructor() {
         this.queues = {};
-    }
-    size(actorId) {
-        return __awaiter(this, void 0, void 0, function* () {
+        this.size = (actorId) => __awaiter(this, void 0, void 0, function* () {
             return this.queues[actorId] ? this.queues[actorId].length : 0;
         });
-    }
-    push(actorId, item) {
-        return __awaiter(this, void 0, void 0, function* () {
+        this.push = (actorId, item) => __awaiter(this, void 0, void 0, function* () {
             if (!this.queues[actorId]) {
                 this.queues[actorId] = [];
             }
             this.queues[actorId].push(item);
         });
-    }
-    pop(actorId) {
-        return __awaiter(this, void 0, void 0, function* () {
+        this.pop = (actorId) => __awaiter(this, void 0, void 0, function* () {
             if (!this.queues[actorId] || this.queues[actorId].length === 0) {
                 return null;
             }
             return this.queues[actorId].shift();
         });
-    }
-    peek(actorId) {
-        return __awaiter(this, void 0, void 0, function* () {
+        this.peek = (actorId) => __awaiter(this, void 0, void 0, function* () {
             if (!this.queues[actorId] || this.queues[actorId].length === 0) {
                 return null;
             }
             return this.queues[actorId][0];
         });
-    }
-    flush(actorId) {
-        return __awaiter(this, void 0, void 0, function* () {
+        this.flush = (actorId) => __awaiter(this, void 0, void 0, function* () {
             if (!this.queues[actorId] || this.queues[actorId].length === 0) {
                 return [];
             }
@@ -53,5 +43,5 @@ class InMemoryQueue {
         });
     }
 }
-exports.InMemoryQueue = InMemoryQueue;
+exports.default = InMemoryQueue;
 //# sourceMappingURL=queue.js.map

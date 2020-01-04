@@ -9,14 +9,17 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-const awaiter_1 = require("./awaiter");
+const awaitMessage_1 = require("./awaiter/awaitMessage");
 const enqueue_1 = require("./enqueue");
-const message_1 = require("./message");
-exports.post = (env, input) => __awaiter(void 0, void 0, void 0, function* () {
-    const message = yield enqueue_1.enqueue(env, input);
-    if (message.awaitPolicy === message_1.AwaitPolicy.Forget) {
-        return true;
-    }
-    return awaiter_1.awaitMessage(env, message.messageId, message.awaitTimeoutMillis);
-});
+const awaitPolicy_1 = require("./message/awaitPolicy");
+function post(env, input) {
+    return __awaiter(this, void 0, void 0, function* () {
+        const message = yield enqueue_1.default(env, input);
+        if (message.awaitPolicy === awaitPolicy_1.default.Forget) {
+            return true;
+        }
+        return awaitMessage_1.default(env, message.messageId, message.awaitTimeoutMillis);
+    });
+}
+exports.default = post;
 //# sourceMappingURL=post.js.map

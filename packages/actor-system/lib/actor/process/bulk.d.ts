@@ -1,4 +1,14 @@
-import { IActorMessageBulkConsumer, IActorOptionalHandler, IActorProperty, IActorSubsystem } from "../env";
-import { IAwaiterMeta } from "../message";
-export declare type ActorBulkEnv<T> = IActorProperty & Pick<IActorSubsystem, "logger" | "queue" | "awaiter"> & IActorMessageBulkConsumer<T> & IActorOptionalHandler;
-export declare const processInBulkMode: <T>(env: ActorBulkEnv<T>, isAlive: () => boolean) => Promise<IAwaiterMeta[]>;
+import IAwaiterResolve from "../../awaiter/resolve";
+import IQueueBulkConsumer from "../../queue/bulkConsumer";
+import IQueueLength from "../../queue/length";
+import IActorBulkMessageHandler from "../env/bulkMessageHandler";
+import IActorErrorHandler from "../env/errorHandler";
+import IActorLogger from "../env/logger";
+import IActorProperty from "../env/property";
+import IAwaiterMeta from "../message/awaiterMeta";
+export declare type ActorBulkEnv<T> = IActorProperty & IActorLogger & {
+    queue: IQueueBulkConsumer & IQueueLength;
+} & {
+    awaiter: IAwaiterResolve;
+} & IActorBulkMessageHandler<T> & IActorErrorHandler;
+export default function processInBulkMode<T>(env: ActorBulkEnv<T>, isAlive: () => boolean): Promise<IAwaiterMeta[]>;

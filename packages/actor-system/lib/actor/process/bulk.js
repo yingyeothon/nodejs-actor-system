@@ -10,34 +10,37 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const logger_1 = require("@yingyeothon/logger");
-const awaiter_1 = require("../awaiter");
-const message_1 = require("../message");
+const notifyCompletions_1 = require("../awaiter/notifyCompletions");
+const awaitPolicy_1 = require("../message/awaitPolicy");
 const utils_1 = require("./utils");
-exports.processInBulkMode = (env, isAlive) => __awaiter(void 0, void 0, void 0, function* () {
-    const { queue, id, logger = logger_1.nullLogger, onMessages, onError } = env;
-    logger.debug(`actor`, `process-queue-in-bulk`, id);
-    const messageMetas = [];
-    while (isAlive()) {
-        const messages = yield queue.flush(id);
-        logger.debug(`actor`, `get-messages`, id, messages.length);
-        if (messages.length === 0) {
-            break;
-        }
-        try {
-            logger.debug(`actor`, `process-messages`, id, messages);
-            yield utils_1.maybeAwait(onMessages(messages.map(message => message.item)));
-        }
-        catch (error) {
-            logger.error(`actor`, `process-messages-error`, id, messages, error);
-            if (onError) {
-                yield utils_1.maybeAwait(onError(error));
+function processInBulkMode(env, isAlive) {
+    return __awaiter(this, void 0, void 0, function* () {
+        const { queue, id, logger = logger_1.nullLogger, onMessages, onError } = env;
+        logger.debug(`actor`, `process-queue-in-bulk`, id);
+        const messageMetas = [];
+        while (isAlive()) {
+            const messages = yield queue.flush(id);
+            logger.debug(`actor`, `get-messages`, id, messages.length);
+            if (messages.length === 0) {
+                break;
             }
+            try {
+                logger.debug(`actor`, `process-messages`, id, messages);
+                yield utils_1.maybeAwait(onMessages(messages.map(message => message.item)));
+            }
+            catch (error) {
+                logger.error(`actor`, `process-messages-error`, id, messages, error);
+                if (onError) {
+                    yield utils_1.maybeAwait(onError(error));
+                }
+            }
+            for (const message of messages) {
+                messageMetas.push(utils_1.copyAwaiterMeta(message));
+            }
+            notifyCompletions_1.default(env, messageMetas.filter(meta => meta.awaitPolicy === awaitPolicy_1.default.Act));
         }
-        for (const message of messages) {
-            messageMetas.push(utils_1.copyAwaiterMeta(message));
-        }
-        awaiter_1.notifyCompletions(env, messageMetas.filter(meta => meta.awaitPolicy === message_1.AwaitPolicy.Act));
-    }
-    return messageMetas;
-});
+        return messageMetas;
+    });
+}
+exports.default = processInBulkMode;
 //# sourceMappingURL=bulk.js.map

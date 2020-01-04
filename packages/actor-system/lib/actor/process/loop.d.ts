@@ -1,3 +1,9 @@
-import { IActorSubsystem } from "../env";
-import { IAwaiterMeta } from "../message";
-export declare const processLoop: <T>(env: (import("../env").IActorProperty & Pick<IActorSubsystem, "logger" | "awaiter" | "queue"> & import("../env").IActorMessageSingleConsumer<T> & import("../env").IActorOptionalHandler & Pick<IActorSubsystem, "lock">) | (import("../env").IActorProperty & Pick<IActorSubsystem, "logger" | "awaiter" | "queue"> & import("../env").IActorMessageBulkConsumer<T> & import("../env").IActorOptionalHandler & Pick<IActorSubsystem, "lock">), isAlive: () => boolean) => Promise<IAwaiterMeta[]>;
+import ILockRelease from "../../lock/release";
+import ILockAcquire from "../../lock/tryAcquire";
+import IAwaiterMeta from "../message/awaiterMeta";
+import { ActorBulkEnv } from "./bulk";
+import { ActorSingleEnv } from "./single";
+export declare type ActorLoopEnvironment<T> = (ActorSingleEnv<T> | ActorBulkEnv<T>) & {
+    lock: ILockAcquire & ILockRelease;
+};
+export default function processLoop<T>(env: ActorLoopEnvironment<T>, isAlive: () => boolean): Promise<IAwaiterMeta[]>;

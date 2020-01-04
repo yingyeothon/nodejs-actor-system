@@ -9,11 +9,14 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-const awaiter_1 = require("./awaiter");
+const awaitMessageAfterTryToProcess_1 = require("./awaiter/awaitMessageAfterTryToProcess");
 const enqueue_1 = require("./enqueue");
 const process_1 = require("./process");
-exports.send = (env, input, options = {}) => __awaiter(void 0, void 0, void 0, function* () {
-    const message = yield enqueue_1.enqueue(env, input);
-    return awaiter_1.awaitMessageAfterTryToProcess(env, message, () => process_1.tryToProcess(env, options));
-});
+function send(env, input, options = {}) {
+    return __awaiter(this, void 0, void 0, function* () {
+        const message = yield enqueue_1.default(env, input);
+        return awaitMessageAfterTryToProcess_1.default(env, message, () => process_1.default(env, options));
+    });
+}
+exports.default = send;
 //# sourceMappingURL=send.js.map

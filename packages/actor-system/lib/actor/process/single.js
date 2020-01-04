@@ -10,23 +10,26 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const logger_1 = require("@yingyeothon/logger");
-const awaiter_1 = require("../awaiter");
-const message_1 = require("../message");
+const notifyCompletion_1 = require("../awaiter/notifyCompletion");
+const awaitPolicy_1 = require("../message/awaitPolicy");
 const utils_1 = require("./utils");
-exports.processInSingleMode = (env, isAlive) => __awaiter(void 0, void 0, void 0, function* () {
-    if (!isAlive()) {
-        return [];
-    }
-    const { id, onPrepare, onCommit } = env;
-    if (onPrepare) {
-        yield utils_1.maybeAwait(onPrepare(id));
-    }
-    const localMetas = yield processQueueInLock(env, isAlive);
-    if (onCommit) {
-        yield utils_1.maybeAwait(onCommit(id));
-    }
-    return localMetas;
-});
+function processInSingleMode(env, isAlive) {
+    return __awaiter(this, void 0, void 0, function* () {
+        if (!isAlive()) {
+            return [];
+        }
+        const { id, onPrepare, onCommit } = env;
+        if (onPrepare) {
+            yield utils_1.maybeAwait(onPrepare(id));
+        }
+        const localMetas = yield processQueueInLock(env, isAlive);
+        if (onCommit) {
+            yield utils_1.maybeAwait(onCommit(id));
+        }
+        return localMetas;
+    });
+}
+exports.default = processInSingleMode;
 const processQueueInLock = (env, isAlive) => __awaiter(void 0, void 0, void 0, function* () {
     const { queue, id, logger = logger_1.nullLogger } = env;
     logger.debug(`actor`, `process-queue-in-single`, id);
@@ -41,8 +44,8 @@ const processQueueInLock = (env, isAlive) => __awaiter(void 0, void 0, void 0, f
         }
         yield processMessage(env, message);
         messageMetas.push(utils_1.copyAwaiterMeta(message));
-        if (message.awaitPolicy === message_1.AwaitPolicy.Act) {
-            notifyPromises.push(awaiter_1.notifyCompletion(env, message));
+        if (message.awaitPolicy === awaitPolicy_1.default.Act) {
+            notifyPromises.push(notifyCompletion_1.default(env, message));
         }
         yield queue.pop(id);
         logger.debug(`actor`, `delete-message`, id);

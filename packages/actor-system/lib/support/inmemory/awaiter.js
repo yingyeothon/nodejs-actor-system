@@ -38,5 +38,5 @@ class InMemoryAwaiter {
         delete this.resolvers[id];
     }
 }
-exports.InMemoryAwaiter = InMemoryAwaiter;
+exports.default = InMemoryAwaiter;
 //# sourceMappingURL=awaiter.js.map

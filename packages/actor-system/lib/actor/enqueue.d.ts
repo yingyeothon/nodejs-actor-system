@@ -1,3 +1,9 @@
-import { IActorProperty, IActorSubsystem } from "./env";
-import { IUserMessage, IUserMessageItem, IUserMessageMeta } from "./message";
-export declare const enqueue: <T>(env: Pick<IActorProperty, "id"> & Pick<IActorSubsystem, "logger" | "queue">, input: IUserMessageItem<T> & Partial<IUserMessageMeta>) => Promise<IUserMessage<T>>;
+import IQueueProducer from "../queue/producer";
+import IActorLogger from "./env/logger";
+import IActorProperty from "./env/property";
+import IUserMessage from "./message/userMessage";
+import IUserMessageItem from "./message/userMessageItem";
+import IUserMessageMeta from "./message/userMessageMeta";
+export default function enqueue<T>(env: IActorProperty & IActorLogger & {
+    queue: IQueueProducer;
+}, input: IUserMessageItem<T> & Partial<IUserMessageMeta>): Promise<IUserMessage<T>>;
