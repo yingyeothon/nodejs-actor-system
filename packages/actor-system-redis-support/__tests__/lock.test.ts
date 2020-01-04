@@ -2,8 +2,11 @@ import { ConsoleLogger } from "@yingyeothon/logger";
 import { testRedis } from ".";
 import { RedisLock } from "..";
 
-testRedis("lock", async redis => {
-  const lock = new RedisLock({ redis, logger: new ConsoleLogger(`debug`) });
+testRedis("lock", async connection => {
+  const lock = new RedisLock({
+    connection,
+    logger: new ConsoleLogger(`debug`)
+  });
   const actorId = "test-actor";
   await lock.release(actorId);
 

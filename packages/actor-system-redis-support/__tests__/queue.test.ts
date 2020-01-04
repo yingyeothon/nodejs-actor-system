@@ -7,8 +7,11 @@ interface IKeyValue {
   value: string;
 }
 
-testRedis("queue", async redis => {
-  const queue = new RedisQueue({ redis, logger: new ConsoleLogger(`debug`) });
+testRedis("queue", async connection => {
+  const queue = new RedisQueue({
+    connection,
+    logger: new ConsoleLogger(`debug`)
+  });
   const actorId = "test-actor";
 
   expect(await queue.size(actorId)).toBe(0);

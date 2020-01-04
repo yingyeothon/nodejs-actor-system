@@ -1,27 +1,32 @@
-import * as IORedis from "ioredis";
+import connect, {
+  IRedisConnection
+} from "@yingyeothon/naive-redis/lib/connection";
 
 const isRedisNotSupported = () =>
   !process.env.TEST_REDIS_PORT || !process.env.TEST_REDIS_HOST;
 
-const redisWork = async (cb: (redis: IORedis.Redis) => Promise<any>) => {
+const redisWork = async (
+  cb: (connection: IRedisConnection) => Promise<any>
+) => {
   if (isRedisNotSupported()) {
     console.log(`No test env: TEST_REDIS_PORT, TEST_REDIS_HOST`);
     return;
   }
-  const redis = new IORedis(
-    +process.env.TEST_REDIS_PORT!,
-    process.env.TEST_REDIS_HOST!
-  );
+  const connection = connect({
+    host: process.env.TEST_REDIS_HOST!,
+    port: +process.env.TEST_REDIS_PORT!,
+    timeoutMillis: 1000
+  });
   try {
-    await cb(redis);
+    await cb(connection);
   } finally {
-    redis.disconnect();
+    connection.socket.disconnect();
   }
 };
 
 export const testRedis = (
   name: string,
-  cb: (redis: IORedis.Redis) => Promise<any>
+  cb: (connection: IRedisConnection) => Promise<any>
 ) => {
   if (isRedisNotSupported()) {
     // A dummy test to ignore jest errors.

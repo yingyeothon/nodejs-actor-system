@@ -3,6 +3,7 @@ import { ConsoleLogger } from "@yingyeothon/logger";
 import { testRedis } from ".";
 import { newRedisSubsystem } from "../src";
 
+
 interface IAdderMessage {
   delta: number;
 }
@@ -18,15 +19,17 @@ class Adder {
   public onMessage = (message: IAdderMessage) => (this.value += message.delta);
 }
 
-testRedis("simple-actor", async redis => {
+testRedis("simple-actor", async connection => {
   const adder = new Adder("adder");
-  const env = Actor.newEnv(
-    newRedisSubsystem({
-      redis,
+  const env = {
+    ...Actor.singleConsumer,
+    ...newRedisSubsystem({
+      connection,
       keyPrefix: "__TEST__simple__",
       logger: new ConsoleLogger(`debug`)
-    })
-  )(adder);
+    }),
+    ...adder
+  };
 
   expect(adder.state).toBeUndefined();
   expect(adder.value).toEqual(0);

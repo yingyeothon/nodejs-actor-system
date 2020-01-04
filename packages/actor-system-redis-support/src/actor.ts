@@ -1,28 +1,28 @@
-import * as Actor from "@yingyeothon/actor-system";
 import { ILogger, nullLogger } from "@yingyeothon/logger";
-import * as IORedis from "ioredis";
+import { IRedisConnection } from "@yingyeothon/naive-redis/lib/connection";
 import { RedisAwaiter } from "./awaiter";
 import { RedisLock } from "./lock";
 import { RedisQueue } from "./queue";
 
 interface IRedisOptions {
-  redis?: IORedis.Redis;
+  connection: IRedisConnection;
   keyPrefix?: string;
   logger?: ILogger;
 }
 
 export const newRedisSubsystem = ({
-  redis = new IORedis(),
+  connection,
   keyPrefix = "",
   logger = nullLogger
-}: IRedisOptions): Pick<
-  Actor.IActorSubsystem,
-  "queue" | "lock" | "awaiter"
-> => ({
-  queue: new RedisQueue({ redis, keyPrefix: keyPrefix + "queue:", logger }),
-  lock: new RedisLock({ redis, keyPrefix: keyPrefix + "lock:", logger }),
+}: IRedisOptions) => ({
+  queue: new RedisQueue({
+    connection,
+    keyPrefix: keyPrefix + "queue:",
+    logger
+  }),
+  lock: new RedisLock({ connection, keyPrefix: keyPrefix + "lock:", logger }),
   awaiter: new RedisAwaiter({
-    redis,
+    connection,
     keyPrefix: keyPrefix + "awaiter:",
     logger
   })

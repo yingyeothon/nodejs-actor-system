@@ -12,16 +12,26 @@ Using Redis-based queue and lock instead of In-memory-based one, it can support 
 import * as Actor from "@yingyeothon/actor-system";
 import * as RedisSupport from "@yingyeothon/actor-system-redis-support";
 import { RedisRepository } from "@yingyeothon/repository-redis";
-import * as IORedis from "ioredis";
+import connect, {
+  IRedisConnection
+} from "@yingyeothon/naive-redis/lib/connect";
+-import * as IORedis from "ioredis";
 
-const redis = new IORedis();
+const connection = connect({
+  host: `my.redis.domain`,
+  port: 6379,
+  password: `very-secret`,
+  timeoutMillis: 1000
+});
+
 const subsys: Actor.IActorSubsystem = {
-  queue: new RedisSupport.RedisQueue({ redis }),
-  lock: new RedisSupport.RedisLock({ redis }),
-  awaiter: new RedisSupport.RedisAwaiter({ redis })
+  queue: new RedisSupport.RedisQueue({ connection }),
+  lock: new RedisSupport.RedisLock({ connection }),
+  awaiter: new RedisSupport.RedisAwaiter({ connection })
 };
 
 // Keep a state using Redis.
+const redis = new IORedis();
 const repo = new RedisRepository({ redis, prefix: "adder:" });
 class Adder {
   private value = 0;
@@ -41,7 +51,7 @@ class Adder {
   };
 }
 
-const env = Actor.newEnv(subsys)(new Adder(`adder-1`));
+const env = { ...Actor.singleConsumer, ...subsys, ...new Adder(`adder-1`) };
 Actor.send(env, { item: { delta: 100 } });
 Actor.send(env, { item: { delta: 200 } });
 Actor.send(env, { item: { delta: -500 } });
@@ -69,7 +79,7 @@ class Adder {
   };
 }
 
-const env = Actor.newBulkEnv(subsys)(new Adder(`adder-1`));
+const env = { ...Actor.bulkConsumer, ...subsys, ...new Adder(`adder-1`) };
 Actor.send(env, { item: { delta: 100 } });
 Actor.send(env, { item: { delta: 200 } });
 Actor.send(env, { item: { delta: -500 } });
@@ -110,6 +120,25 @@ await processActor(`adder-1`);
 
 // In producer context
 await Actor.post({ ...subsys, id: `adder-1` }, { item: { delta: 100 } });
+```
+
+If we want to minimize the code size of producer, we can use like this.
+
+```typescript
+import actorEnqueue from "@yingyeothon/actor-system/lib/actor/enqueue";
+import redisConnect from "@yingyeothon/naive-redis/lib/connection";
+import redisQueuePush from "@yingyeothon/actor-system-redis-support/lib/queue/push";
+
+const connection = redisConnect({
+  host: `my.redis.domain`
+});
+await actorEnqueue(
+  {
+    id: `adder-1`,
+    queue: redisQueuePush({ connection })
+  },
+  { item: { delta: 1 } }
+);
 ```
 
 ## License

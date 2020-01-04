@@ -18,15 +18,17 @@ class Adder {
   public onMessage = (message: IAdderMessage) => (this.value += message.delta);
 }
 
-testRedis("adder-await", async redis => {
+testRedis("adder-await", async connection => {
   const adder = new Adder("adder");
-  const env = Actor.newEnv(
-    newRedisSubsystem({
-      redis,
+  const env = {
+    ...Actor.singleConsumer,
+    ...newRedisSubsystem({
+      connection,
       keyPrefix: "__TEST__await__",
       logger: new ConsoleLogger(`debug`)
-    })
-  )(adder);
+    }),
+    ...adder
+  };
 
   expect(adder.state).toBeUndefined();
   expect(adder.value).toEqual(0);
@@ -48,6 +50,7 @@ testRedis("adder-await", async redis => {
   const orderSet: string[] = [];
   setTimeout(async () => {
     orderSet.push("first");
+    console.log(`reach the first`);
     await Actor.tryToProcess(env, { oneShot: true });
   }, 50);
 
@@ -56,9 +59,11 @@ testRedis("adder-await", async redis => {
     awaitPolicy: Actor.AwaitPolicy.Commit,
     awaitTimeoutMillis: 200
   });
+  console.log(`after post`);
   expect(wait).toBe(true);
 
   orderSet.push("second");
+  console.log(`reach the second`);
   expect(adder.state).toEqual("committed");
   expect(adder.value).toEqual(3);
   expect(orderSet).toEqual(["first", "second"]);

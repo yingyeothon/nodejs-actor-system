@@ -37,9 +37,6 @@
     "@yingyeothon/actor-system": "^0.2.2",
     "@yingyeothon/codec": "^0.2.0",
     "@yingyeothon/logger": "^0.2.0",
-    "ioredis": "^4.11.2"
-  },
-  "devDependencies": {
-    "@types/ioredis": "^4.0.13"
+    "@yingyeothon/naive-redis": "^0.1.3"
   }
 }
