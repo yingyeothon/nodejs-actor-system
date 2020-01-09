@@ -165,6 +165,55 @@ Actor.send(
 
 It can be expanded a distributed actor system easily when both of a queue and a lock work properly in shared instances.
 
+### EventLoop
+
+We can forget about `awaiter` for a while and focus on the more basic structure. They are `enqueue` and `eventLoop`. This is useful if we want to process other tasks in a loop as well as process a message when the actor's lock is occupied. For example, we could process the game logic by polling game messages from the actor queue.
+
+```typescript
+import * as Actor from "@yingyeothon/actor-system";
+import * as InMemorySupport from "@yingyeothon/actor-system/lib/support/inmemory";
+
+const subsys = {
+  queue: new InMemorySupport.InMemoryQueue(),
+  lock: new InMemorySupport.InMemoryLock(),
+  awaiter: new InMemorySupport.InMemoryAwaiter()
+};
+
+class Game {
+  constructor(public readonly id: string) {}
+
+  public loop = async (poll: () => Promise<GameMessage[]>) => {
+    while (this.running) {
+      this.processMessages(await poll());
+      this.tick();
+    }
+  };
+}
+
+const subsys = {
+  queue: new InMemorySupport.InMemoryQueue(),
+  lock: new InMemorySupport.InMemoryLock()
+};
+
+async function main() {
+  const game = new Game("GAME_ID");
+  await Actor.eventLoop<GameMessage>({
+    ...subsys,
+    ...game
+  });
+}
+
+async function sendMessage(gameId: string, message: GameMessage) {
+  await Actor.enqueue(
+    {
+      ...subsys,
+      id: gameId
+    },
+    { item: message }
+  );
+}
+```
+
 ## License
 
 MIT
