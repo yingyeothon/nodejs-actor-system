@@ -1,5 +1,7 @@
 import * as Actor from "@yingyeothon/actor-system";
 import { IActorProcessOptions } from "@yingyeothon/actor-system";
+import { ActorSendEnvironment } from "@yingyeothon/actor-system/lib/actor/send";
+import ActorShift from "@yingyeothon/actor-system/lib/shift";
 import { ILogger, nullLogger } from "@yingyeothon/logger";
 import { Handler } from "aws-lambda";
 import { Lambda } from "aws-sdk";
@@ -9,7 +11,7 @@ import { globalTimeline } from "./time";
 const defaultLambdaFunctionTimeoutMillis = 870 * 1000;
 
 interface IActorLambdaHandlerArguments<P> {
-  newActorEnv: (event: P) => Actor.ActorEnvironment<any>;
+  newActorEnv: (event: P) => ActorSendEnvironment<any>;
   logger?: ILogger;
   processOptions?: IActorProcessOptions;
 }
@@ -53,7 +55,7 @@ export const shiftToNextLambda = <P = IActorLambdaEvent>({
   functionName,
   functionVersion,
   buildPayload = actorId => ({ actorId } as any)
-}: IShiftToNextLambdaArguments<P>): Actor.ActorShift => actorId =>
+}: IShiftToNextLambdaArguments<P>): ActorShift => actorId =>
   new Lambda()
     .invoke({
       FunctionName: functionName,
