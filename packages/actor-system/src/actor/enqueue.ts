@@ -8,8 +8,11 @@ import IUserMessage from "./message/userMessage";
 import IUserMessageItem from "./message/userMessageItem";
 import IUserMessageMeta from "./message/userMessageMeta";
 
+export type ActorEnqueueEnvironment = IActorProperty &
+  IActorLogger & { queue: IQueueProducer };
+
 export default async function enqueue<T>(
-  env: IActorProperty & IActorLogger & { queue: IQueueProducer },
+  env: ActorEnqueueEnvironment,
   input: IUserMessageItem<T> & Partial<IUserMessageMeta>
 ): Promise<IUserMessage<T>> {
   const { id, queue, logger = nullLogger } = env;

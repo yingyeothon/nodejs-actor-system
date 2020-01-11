@@ -1,12 +1,13 @@
 import IAwaiterWait from "../awaiter/wait";
-import IQueueProducer from "../queue/producer";
 import awaitMessage from "./awaiter/awaitMessage";
-import enqueue from "./enqueue";
-import IActorLogger from "./env/logger";
+import enqueue, { ActorEnqueueEnvironment } from "./enqueue";
 import IActorProperty from "./env/property";
 import AwaitPolicy from "./message/awaitPolicy";
 import IUserMessageItem from "./message/userMessageItem";
 import IUserMessageMeta from "./message/userMessageMeta";
+
+export type ActorPostEnvironment = IActorProperty &
+  ActorEnqueueEnvironment & { awaiter: IAwaiterWait };
 
 /**
  * Send a message to this `Actor`, just like the `send` function, but it does not process the message.
@@ -16,8 +17,7 @@ import IUserMessageMeta from "./message/userMessageMeta";
  * with `aliveMillis` and no `oneShot`.
  */
 export default async function post<T>(
-  env: IActorProperty &
-    IActorLogger & { queue: IQueueProducer } & { awaiter: IAwaiterWait },
+  env: ActorPostEnvironment,
   input: IUserMessageItem<T> & Partial<IUserMessageMeta>
 ): Promise<boolean> {
   const message = await enqueue(env, input);

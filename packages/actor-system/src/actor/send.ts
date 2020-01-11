@@ -1,15 +1,13 @@
 import IAwaiterWait from "../awaiter/wait";
-import IQueueProducer from "../queue/producer";
 import awaitMessageAfterTryToProcess from "./awaiter/awaitMessageAfterTryToProcess";
-import enqueue from "./enqueue";
+import enqueue, { ActorEnqueueEnvironment } from "./enqueue";
 import IUserMessageItem from "./message/userMessageItem";
 import IUserMessageMeta from "./message/userMessageMeta";
 import tryToProcess, { ActorProcessEnvironment } from "./process";
 import IActorProcessOptions from "./process/options";
 
-type ActorSendEnvironment<T> = ActorProcessEnvironment<T> & {
-  queue: IQueueProducer;
-} & { awaiter: IAwaiterWait };
+export type ActorSendEnvironment<T> = ActorEnqueueEnvironment &
+  ActorProcessEnvironment<T> & { awaiter: IAwaiterWait };
 
 /**
  * Send a message to this `Actor` and try to process that message with `ProcessOptions`.

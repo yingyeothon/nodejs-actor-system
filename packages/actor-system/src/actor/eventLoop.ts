@@ -1,20 +1,19 @@
-import { ILogger, nullLogger } from "@yingyeothon/logger";
+import { nullLogger } from "@yingyeothon/logger";
 import ILockRelease from "../lock/release";
 import ILockAcquire from "../lock/tryAcquire";
 import QueueBulkConsumer from "../queue/bulkConsumer";
+import IActorLogger from "./env/logger";
+import IActorProperty from "./env/property";
 import IUserMessage from "./message/userMessage";
 
-export type ActroEventLoopEnvironment<T> = {
-  lock: ILockAcquire & ILockRelease;
-} & {
-  queue: QueueBulkConsumer;
-} & {
-  id: string;
-} & {
-  logger?: ILogger;
-} & {
-  loop: (poll: () => Promise<T[]>) => Promise<void>;
-};
+export type ActroEventLoopEnvironment<T> = IActorProperty &
+  IActorLogger & {
+    lock: ILockAcquire & ILockRelease;
+  } & {
+    queue: QueueBulkConsumer;
+  } & {
+    loop: (poll: () => Promise<T[]>) => Promise<void>;
+  };
 
 export default async function eventLoop<T>(
   env: ActroEventLoopEnvironment<T>
