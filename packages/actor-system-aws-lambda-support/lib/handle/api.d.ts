@@ -1,8 +1,9 @@
 import * as Actor from "@yingyeothon/actor-system";
+import { ActorSendEnvironment } from "@yingyeothon/actor-system/lib/actor/send";
 import { ILogger } from "@yingyeothon/logger";
 import { APIGatewayProxyEvent } from "aws-lambda";
 interface IActorAPIEventHandlerArguments<T> {
-    newActorEnv: (apiPath: string, event: APIGatewayProxyEvent) => Actor.ActorEnvironment<T>;
+    newActorEnv: (apiPath: string, event: APIGatewayProxyEvent) => ActorSendEnvironment<T>;
     parseMessage?: (body: string) => T;
     logger?: ILogger;
     policy: {

@@ -13,5 +13,7 @@ var process_1 = require("./process");
 exports.tryToProcess = process_1.default;
 var send_1 = require("./send");
 exports.send = send_1.default;
+var eventLoop_1 = require("./eventLoop");
+exports.eventLoop = eventLoop_1.default;
 __export(require("./env/consumeType"));
 //# sourceMappingURL=index.js.map

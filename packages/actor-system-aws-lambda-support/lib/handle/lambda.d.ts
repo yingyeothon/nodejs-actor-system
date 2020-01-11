@@ -1,10 +1,11 @@
-import * as Actor from "@yingyeothon/actor-system";
 import { IActorProcessOptions } from "@yingyeothon/actor-system";
+import { ActorSendEnvironment } from "@yingyeothon/actor-system/lib/actor/send";
+import ActorShift from "@yingyeothon/actor-system/lib/shift";
 import { ILogger } from "@yingyeothon/logger";
 import { Handler } from "aws-lambda";
 import { IActorLambdaEvent } from "./event";
 interface IActorLambdaHandlerArguments<P> {
-    newActorEnv: (event: P) => Actor.ActorEnvironment<any>;
+    newActorEnv: (event: P) => ActorSendEnvironment<any>;
     logger?: ILogger;
     processOptions?: IActorProcessOptions;
 }
@@ -14,5 +15,5 @@ interface IShiftToNextLambdaArguments<P> {
     functionVersion?: string;
     buildPayload?: (actorId: string) => P;
 }
-export declare const shiftToNextLambda: <P = IActorLambdaEvent>({ functionName, functionVersion, buildPayload }: IShiftToNextLambdaArguments<P>) => Actor.ActorShift;
+export declare const shiftToNextLambda: <P = IActorLambdaEvent>({ functionName, functionVersion, buildPayload }: IShiftToNextLambdaArguments<P>) => ActorShift;
 export {};
