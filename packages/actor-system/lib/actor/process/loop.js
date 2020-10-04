@@ -9,11 +9,11 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-const logger_1 = require("@yingyeothon/logger");
-const notifyCompletions_1 = require("../awaiter/notifyCompletions");
-const awaitPolicy_1 = require("../message/awaitPolicy");
 const bulk_1 = require("./bulk");
 const single_1 = require("./single");
+const awaitPolicy_1 = require("../message/awaitPolicy");
+const notifyCompletions_1 = require("../awaiter/notifyCompletions");
+const logger_1 = require("@yingyeothon/logger");
 function processLoop(env, isAlive) {
     return __awaiter(this, void 0, void 0, function* () {
         const { id, queue, lock, logger = logger_1.nullLogger } = env;
@@ -37,7 +37,7 @@ function processLoop(env, isAlive) {
             Array.prototype.push.apply(messageMetas, localMetas);
             logger.debug(`actor`, `release-lock`, id);
             yield lock.release(id);
-            yield notifyCompletions_1.default(env, messageMetas.filter(meta => meta.awaitPolicy === awaitPolicy_1.default.Commit));
+            yield notifyCompletions_1.default(env, messageMetas.filter((meta) => meta.awaitPolicy === awaitPolicy_1.default.Commit));
             if ((yield queue.size(id)) === 0) {
                 logger.debug(`actor`, `empty-queue`, id);
                 break;

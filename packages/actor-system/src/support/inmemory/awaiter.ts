@@ -1,9 +1,9 @@
-import IAwaiterResolve from "../../awaiter/resolve";
-import IAwaiterWait from "../../awaiter/wait";
+import AwaiterResolve from "../../awaiter/resolve";
+import AwaiterWait from "../../awaiter/wait";
 
 type BooleanResolver = (result: boolean) => void;
 
-export default class InMemoryAwaiter implements IAwaiterWait, IAwaiterResolve {
+export default class InMemoryAwaiter implements AwaiterWait, AwaiterResolve {
   private resolvers: { [id: string]: BooleanResolver } = {};
 
   public async wait(
@@ -12,7 +12,7 @@ export default class InMemoryAwaiter implements IAwaiterWait, IAwaiterResolve {
     timeoutMillis: number
   ): Promise<boolean> {
     const id = actorId + messageId;
-    return new Promise<boolean>(resolve => {
+    return new Promise<boolean>((resolve) => {
       this.resolvers[id] = resolve;
       if (timeoutMillis > 0) {
         setTimeout(() => this.finish(id, false), timeoutMillis);

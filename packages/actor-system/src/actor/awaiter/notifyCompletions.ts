@@ -1,12 +1,12 @@
+import ActorLogger from "../env/logger";
+import ActorProperty from "../env/property";
+import AwaiterMeta from "../message/awaiterMeta";
+import AwaiterResolve from "../../awaiter/resolve";
 import { nullLogger } from "@yingyeothon/logger";
-import IAwaiterResolve from "../../awaiter/resolve";
-import IActorLogger from "../env/logger";
-import IActorProperty from "../env/property";
-import IAwaiterMeta from "../message/awaiterMeta";
 
 export default async function notifyCompletions(
-  env: IActorProperty & IActorLogger & { awaiter: IAwaiterResolve },
-  metas: IAwaiterMeta[]
+  env: ActorProperty & ActorLogger & { awaiter: AwaiterResolve },
+  metas: AwaiterMeta[]
 ): Promise<void> {
   const { id, logger = nullLogger, awaiter } = env;
   try {
@@ -17,7 +17,7 @@ export default async function notifyCompletions(
     }
 
     await Promise.all(
-      targetIds.map(messageId => awaiter.resolve(id, messageId))
+      targetIds.map((messageId) => awaiter.resolve(id, messageId))
     );
   } catch (error) {
     logger.error(`actor`, `awaiter-resolve-error`, id, error);

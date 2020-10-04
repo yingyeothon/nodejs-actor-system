@@ -1,6 +1,6 @@
-import IUserMessageItem from "./userMessageItem";
-import IUserMessageMeta from "./userMessageMeta";
+import UserMessageItem from "./userMessageItem";
+import UserMessageMeta from "./userMessageMeta";
 
-export default interface IUserMessage<T>
-  extends IUserMessageItem<T>,
-    IUserMessageMeta {}
+export default interface UserMessage<T>
+  extends UserMessageItem<T>,
+    UserMessageMeta {}

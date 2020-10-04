@@ -1,7 +1,8 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-const acquire_1 = require("./acquire");
+exports.RedisLock = void 0;
 const release_1 = require("./release");
+const acquire_1 = require("./acquire");
 class RedisLock {
     constructor(args) {
         const awaiter = Object.assign(Object.assign({}, acquire_1.default(args)), release_1.default(args));

@@ -1,14 +1,15 @@
 import * as Actor from "@yingyeothon/actor-system";
+
 import { ConsoleLogger } from "@yingyeothon/logger";
-import { testRedis } from ".";
 import { newRedisSubsystem } from "../src";
+import { testRedis } from ".";
 
 interface IAdderMessage {
   delta: number;
 }
 
 class Adder {
-  public value: number = 0;
+  public value = 0;
   public state: undefined | "prepared" | "committed";
 
   constructor(public readonly id: string) {}
@@ -18,16 +19,16 @@ class Adder {
   public onMessage = (message: IAdderMessage) => (this.value += message.delta);
 }
 
-testRedis("adder-await", async connection => {
+testRedis("adder-await", async (connection) => {
   const adder = new Adder("adder");
   const env = {
     ...Actor.singleConsumer,
     ...newRedisSubsystem({
       connection,
       keyPrefix: "__TEST__await__",
-      logger: new ConsoleLogger(`debug`)
+      logger: new ConsoleLogger(`debug`),
     }),
-    ...adder
+    ...adder,
   };
 
   expect(adder.state).toBeUndefined();
@@ -35,14 +36,14 @@ testRedis("adder-await", async connection => {
 
   await Actor.send(env, {
     item: { delta: 1 },
-    awaitPolicy: Actor.AwaitPolicy.Commit
+    awaitPolicy: Actor.AwaitPolicy.Commit,
   });
   expect(adder.state).toEqual("committed");
   expect(adder.value).toEqual(1);
 
   await Actor.send(env, {
     item: { delta: 1 },
-    awaitPolicy: Actor.AwaitPolicy.Commit
+    awaitPolicy: Actor.AwaitPolicy.Commit,
   });
   expect(adder.state).toEqual("committed");
   expect(adder.value).toEqual(2);
@@ -57,7 +58,7 @@ testRedis("adder-await", async connection => {
   const wait = await Actor.post(env, {
     item: { delta: 1 },
     awaitPolicy: Actor.AwaitPolicy.Commit,
-    awaitTimeoutMillis: 200
+    awaitTimeoutMillis: 200,
   });
   console.log(`after post`);
   expect(wait).toBe(true);

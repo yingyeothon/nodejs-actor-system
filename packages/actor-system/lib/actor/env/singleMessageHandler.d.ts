@@ -1,6 +1,6 @@
-export default interface IActorSingleMessageHandler<T> {
+export default interface ActorSingleMessageHandler<T> {
     _consume: "single";
-    onMessage: (message: T) => any | Promise<any>;
-    onPrepare?: (id: string) => any | Promise<any>;
-    onCommit?: (id: string) => any | Promise<any>;
+    onMessage: (message: T) => unknown | Promise<unknown>;
+    onPrepare?: (id: string) => unknown | Promise<unknown>;
+    onCommit?: (id: string) => unknown | Promise<unknown>;
 }

@@ -1,7 +1,7 @@
-import IAwaiterResolve from "../../awaiter/resolve";
-import IActorLogger from "../env/logger";
-import IActorProperty from "../env/property";
-import IAwaiterMeta from "../message/awaiterMeta";
-export default function notifyCompletion(env: IActorProperty & IActorLogger & {
-    awaiter: IAwaiterResolve;
-}, meta: IAwaiterMeta): Promise<void>;
+import ActorLogger from "../env/logger";
+import ActorProperty from "../env/property";
+import AwaiterMeta from "../message/awaiterMeta";
+import AwaiterResolve from "../../awaiter/resolve";
+export default function notifyCompletion(env: ActorProperty & ActorLogger & {
+    awaiter: AwaiterResolve;
+}, meta: AwaiterMeta): Promise<void>;

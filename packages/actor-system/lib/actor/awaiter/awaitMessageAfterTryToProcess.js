@@ -17,7 +17,7 @@ function awaitMessageAfterTryToProcess(env, currentMeta, tryToProcess) {
         if (currentMeta.awaitPolicy === awaitPolicy_1.default.Forget) {
             return true;
         }
-        if (resolvedMetas.some(meta => meta.messageId === currentMeta.messageId)) {
+        if (resolvedMetas.some((meta) => meta.messageId === currentMeta.messageId)) {
             return true;
         }
         return awaitMessage_1.default(env, currentMeta.messageId, currentMeta.awaitTimeoutMillis);

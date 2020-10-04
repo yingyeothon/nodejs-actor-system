@@ -9,10 +9,11 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.handleActorAPIEvent = void 0;
 const Actor = require("@yingyeothon/actor-system");
 const logger_1 = require("@yingyeothon/logger");
 const defaultAPIProxyFunctionTimeoutMillis = 5 * 1000;
-exports.handleActorAPIEvent = ({ newActorEnv, parseMessage: maybeParseMessage, logger: maybeLogger, policy }) => (event) => __awaiter(void 0, void 0, void 0, function* () {
+exports.handleActorAPIEvent = ({ newActorEnv, parseMessage: maybeParseMessage, logger: maybeLogger, policy, }) => (event) => __awaiter(void 0, void 0, void 0, function* () {
     const parseMessage = maybeParseMessage || ((body) => JSON.parse(body));
     const logger = maybeLogger || logger_1.nullLogger;
     logger.debug(`actor-api-handler`, `handle`, event.path, event.body);
@@ -47,14 +48,14 @@ const prepareProcessOptions = (options) => {
     var _a, _b, _c;
     return options
         ? {
-            aliveMillis: (_a = options.aliveMillis, (_a !== null && _a !== void 0 ? _a : defaultAPIProxyFunctionTimeoutMillis)),
-            oneShot: (_b = options.oneShot, (_b !== null && _b !== void 0 ? _b : true)),
-            shiftable: (_c = options.shiftable, (_c !== null && _c !== void 0 ? _c : true))
+            aliveMillis: (_a = options.aliveMillis) !== null && _a !== void 0 ? _a : defaultAPIProxyFunctionTimeoutMillis,
+            oneShot: (_b = options.oneShot) !== null && _b !== void 0 ? _b : true,
+            shiftable: (_c = options.shiftable) !== null && _c !== void 0 ? _c : true,
         }
         : {
             aliveMillis: defaultAPIProxyFunctionTimeoutMillis,
             oneShot: true,
-            shiftable: true
+            shiftable: true,
         };
 };
 //# sourceMappingURL=api.js.map

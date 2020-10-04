@@ -1,3 +1,3 @@
-export default interface IActorProperty {
+export default interface ActorProperty {
     id: string;
 }

@@ -1,10 +1,10 @@
-import IQueueSingleConsumer from "@yingyeothon/actor-system/lib/queue/singleConsumer";
-import { ICodec } from "@yingyeothon/codec";
-import { ILogger } from "@yingyeothon/logger";
-import { IRedisConnection } from "@yingyeothon/naive-redis/lib/connection";
-export default function pop({ connection, keyPrefix, codec, logger }: {
-    connection: IRedisConnection;
+import { Codec } from "@yingyeothon/codec";
+import { LogWriter } from "@yingyeothon/logger";
+import QueueSingleConsumer from "@yingyeothon/actor-system/lib/queue/singleConsumer";
+import { RedisConnection } from "@yingyeothon/naive-redis/lib/connection";
+export default function pop({ connection, keyPrefix, codec, logger, }: {
+    connection: RedisConnection;
     keyPrefix?: string;
-    codec?: ICodec<string>;
-    logger?: ILogger;
-}): IQueueSingleConsumer;
+    codec?: Codec<string>;
+    logger?: LogWriter;
+}): QueueSingleConsumer;

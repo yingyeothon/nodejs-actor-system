@@ -1,6 +1,9 @@
-import IAwaiterMeta from "../message/awaiterMeta";
+import AwaiterMeta from "../message/awaiterMeta";
 
-export const maybeAwait = async (result: Promise<any> | any) => {
+export async function maybeAwait(
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  result: Promise<unknown> | any
+): Promise<void> {
   if (!result) {
     return;
   }
@@ -10,10 +13,12 @@ export const maybeAwait = async (result: Promise<any> | any) => {
   if (result.constructor.name === "Promise") {
     await result;
   }
-};
+}
 
-export const copyAwaiterMeta = (input: IAwaiterMeta): IAwaiterMeta => ({
-  messageId: input.messageId,
-  awaitPolicy: input.awaitPolicy,
-  awaitTimeoutMillis: input.awaitTimeoutMillis
-});
+export function copyAwaiterMeta(input: AwaiterMeta): AwaiterMeta {
+  return {
+    messageId: input.messageId,
+    awaitPolicy: input.awaitPolicy,
+    awaitTimeoutMillis: input.awaitTimeoutMillis,
+  };
+}

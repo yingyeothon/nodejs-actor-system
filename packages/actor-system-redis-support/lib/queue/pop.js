@@ -13,7 +13,7 @@ const codec_1 = require("@yingyeothon/codec");
 const logger_1 = require("@yingyeothon/logger");
 const lindex_1 = require("@yingyeothon/naive-redis/lib/lindex");
 const lpop_1 = require("@yingyeothon/naive-redis/lib/lpop");
-function pop({ connection, keyPrefix = "", codec = new codec_1.JsonCodec(), logger = logger_1.nullLogger }) {
+function pop({ connection, keyPrefix = "", codec = new codec_1.JsonCodec(), logger = logger_1.nullLogger, }) {
     return {
         pop: (actorId) => __awaiter(this, void 0, void 0, function* () {
             const redisKey = keyPrefix + actorId;
@@ -34,7 +34,7 @@ function pop({ connection, keyPrefix = "", codec = new codec_1.JsonCodec(), logg
             const decoded = codec.decode(value);
             logger.debug(`redis-queue`, `peek`, redisKey, decoded);
             return decoded;
-        })
+        }),
     };
 }
 exports.default = pop;

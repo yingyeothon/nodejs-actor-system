@@ -1,26 +1,28 @@
 import * as Actor from "@yingyeothon/actor-system";
-import { IActorProcessOptions } from "@yingyeothon/actor-system";
+
+import { LogWriter, nullLogger } from "@yingyeothon/logger";
+
+import { ActorLambdaEvent } from "./event";
+import { ActorProcessOptions } from "@yingyeothon/actor-system";
 import { ActorSendEnvironment } from "@yingyeothon/actor-system/lib/actor/send";
 import ActorShift from "@yingyeothon/actor-system/lib/shift";
-import { ILogger, nullLogger } from "@yingyeothon/logger";
 import { Handler } from "aws-lambda";
 import { Lambda } from "aws-sdk";
-import { IActorLambdaEvent } from "./event";
 import { globalTimeline } from "./time";
 
 const defaultLambdaFunctionTimeoutMillis = 870 * 1000;
 
 interface IActorLambdaHandlerArguments<P> {
-  newActorEnv: (event: P) => ActorSendEnvironment<any>;
-  logger?: ILogger;
-  processOptions?: IActorProcessOptions;
+  newActorEnv: (event: P) => ActorSendEnvironment<unknown>;
+  logger?: LogWriter;
+  processOptions?: ActorProcessOptions;
 }
 
-export const handleActorLambdaEvent = <P = IActorLambdaEvent>({
+export const handleActorLambdaEvent = <P = ActorLambdaEvent>({
   newActorEnv,
   logger: maybeLogger,
-  processOptions
-}: IActorLambdaHandlerArguments<P>): Handler<P, void> => async event => {
+  processOptions,
+}: IActorLambdaHandlerArguments<P>): Handler<P, void> => async (event) => {
   globalTimeline.reset(
     processOptions?.aliveMillis || defaultLambdaFunctionTimeoutMillis
   );
@@ -38,7 +40,7 @@ export const handleActorLambdaEvent = <P = IActorLambdaEvent>({
     processOptions || {
       aliveMillis: globalTimeline.remainMillis,
       oneShot: true,
-      shiftable: true
+      shiftable: true,
     }
   );
 
@@ -51,16 +53,17 @@ interface IShiftToNextLambdaArguments<P> {
   buildPayload?: (actorId: string) => P;
 }
 
-export const shiftToNextLambda = <P = IActorLambdaEvent>({
+export const shiftToNextLambda = <P = ActorLambdaEvent>({
   functionName,
   functionVersion,
-  buildPayload = actorId => ({ actorId } as any)
-}: IShiftToNextLambdaArguments<P>): ActorShift => actorId =>
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  buildPayload = (actorId) => ({ actorId } as any),
+}: IShiftToNextLambdaArguments<P>): ActorShift => (actorId) =>
   new Lambda()
     .invoke({
       FunctionName: functionName,
       InvocationType: "Event",
       Qualifier: functionVersion || "$LATEST",
-      Payload: JSON.stringify(buildPayload(actorId))
+      Payload: JSON.stringify(buildPayload(actorId)),
     })
     .promise();

@@ -1,3 +1,3 @@
-import IAwaiterMeta from "../message/awaiterMeta";
-export declare const maybeAwait: (result: any) => Promise<void>;
-export declare const copyAwaiterMeta: (input: IAwaiterMeta) => IAwaiterMeta;
+import AwaiterMeta from "../message/awaiterMeta";
+export declare function maybeAwait(result: Promise<unknown> | any): Promise<void>;
+export declare function copyAwaiterMeta(input: AwaiterMeta): AwaiterMeta;

@@ -1,5 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.RedisQueue = void 0;
 const flush_1 = require("./flush");
 const pop_1 = require("./pop");
 const push_1 = require("./push");

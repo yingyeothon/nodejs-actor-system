@@ -1,2 +1,2 @@
-type ActorShift = (actorId: string) => any | Promise<any>;
+type ActorShift = (actorId: string) => unknown | Promise<unknown>;
 export default ActorShift;

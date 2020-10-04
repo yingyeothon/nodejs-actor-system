@@ -1,3 +1,3 @@
-export default interface ILockRelease {
+export default interface LockRelease {
     release: (actorId: string) => Promise<boolean>;
 }

@@ -1,15 +1,15 @@
-import IAwaiterResolve from "@yingyeothon/actor-system/lib/awaiter/resolve";
-import IAwaiterWait from "@yingyeothon/actor-system/lib/awaiter/wait";
-import { ILogger } from "@yingyeothon/logger";
-import { IRedisConnection } from "@yingyeothon/naive-redis/lib/connection";
-interface IRedisAwaiterArguments {
-    connection: IRedisConnection;
+import AwaiterResolve from "@yingyeothon/actor-system/lib/awaiter/resolve";
+import AwaiterWait from "@yingyeothon/actor-system/lib/awaiter/wait";
+import { LogWriter } from "@yingyeothon/logger";
+import { RedisConnection } from "@yingyeothon/naive-redis/lib/connection";
+interface RedisAwaiterArguments {
+    connection: RedisConnection;
     keyPrefix?: string;
-    logger?: ILogger;
+    logger?: LogWriter;
 }
-export declare class RedisAwaiter implements IAwaiterResolve, IAwaiterWait {
+export declare class RedisAwaiter implements AwaiterResolve, AwaiterWait {
     wait: (actorId: string, messageId: string, timeoutMillis: number) => Promise<boolean>;
     resolve: (actorId: string, messageId: string) => Promise<void>;
-    constructor(args: IRedisAwaiterArguments);
+    constructor(args: RedisAwaiterArguments);
 }
 export {};

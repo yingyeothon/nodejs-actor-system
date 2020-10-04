@@ -1,8 +1,8 @@
-import IQueueBulkConsumer from "../../queue/bulkConsumer";
-import IQueueLength from "../../queue/length";
-import IQueueProducer from "../../queue/producer";
-import IQueueSingleConsumer from "../../queue/singleConsumer";
-export default class InMemoryQueue implements IQueueLength, IQueueProducer, IQueueSingleConsumer, IQueueBulkConsumer {
+import QueueBulkConsumer from "../../queue/bulkConsumer";
+import QueueLength from "../../queue/length";
+import QueueProducer from "../../queue/producer";
+import QueueSingleConsumer from "../../queue/singleConsumer";
+export default class InMemoryQueue implements QueueLength, QueueProducer, QueueSingleConsumer, QueueBulkConsumer {
     private readonly queues;
     size: (actorId: string) => Promise<number>;
     push: <T>(actorId: string, item: T) => Promise<void>;

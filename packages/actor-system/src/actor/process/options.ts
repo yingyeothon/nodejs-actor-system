@@ -1,4 +1,4 @@
-export default interface IActorProcessOptions {
+export default interface ActorProcessOptions {
   /**
    * A flag that decides whether to process the actor's message queue only once or continue.
    * Combining `aliveMillis` can lead to complex situations, so please refer to` aliveMillis` comment.

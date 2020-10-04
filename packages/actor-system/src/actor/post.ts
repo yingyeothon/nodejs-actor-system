@@ -1,13 +1,14 @@
-import IAwaiterWait from "../awaiter/wait";
-import awaitMessage from "./awaiter/awaitMessage";
 import enqueue, { ActorEnqueueEnvironment } from "./enqueue";
-import IActorProperty from "./env/property";
-import AwaitPolicy from "./message/awaitPolicy";
-import IUserMessageItem from "./message/userMessageItem";
-import IUserMessageMeta from "./message/userMessageMeta";
 
-export type ActorPostEnvironment = IActorProperty &
-  ActorEnqueueEnvironment & { awaiter: IAwaiterWait };
+import ActorProperty from "./env/property";
+import AwaitPolicy from "./message/awaitPolicy";
+import AwaiterWait from "../awaiter/wait";
+import UserMessageItem from "./message/userMessageItem";
+import UserMessageMeta from "./message/userMessageMeta";
+import awaitMessage from "./awaiter/awaitMessage";
+
+export type ActorPostEnvironment = ActorProperty &
+  ActorEnqueueEnvironment & { awaiter: AwaiterWait };
 
 /**
  * Send a message to this `Actor`, just like the `send` function, but it does not process the message.
@@ -18,7 +19,7 @@ export type ActorPostEnvironment = IActorProperty &
  */
 export default async function post<T>(
   env: ActorPostEnvironment,
-  input: IUserMessageItem<T> & Partial<IUserMessageMeta>
+  input: UserMessageItem<T> & Partial<UserMessageMeta>
 ): Promise<boolean> {
   const message = await enqueue(env, input);
   if (message.awaitPolicy === AwaitPolicy.Forget) {

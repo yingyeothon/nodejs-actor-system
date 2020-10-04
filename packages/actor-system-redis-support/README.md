@@ -65,7 +65,7 @@ It can be rewritten using a bulk way.
 class Adder {
   constructor(public readonly id: string) {}
 
-  public onMessages = async (messages: Array<{ delta: number }>) => {
+  public onMessages = async (messages: { delta: number }[]) => {
     // Load a state from Redis.
     let value = (await repo.get<number>(`value:${this.id}`)) || 0;
 
@@ -100,7 +100,7 @@ class Adder {
 
   public store = async () => repo.set(`value:${this.id}`, this.value);
 
-  public onMessages = async (messages: Array<{ delta: number }>) => {
+  public onMessages = async (messages: { delta: number }[]) => {
     // Process all messages in this actor's queue.
     for (const message of messages) {
       this.value += message.delta;
@@ -130,12 +130,12 @@ import redisConnect from "@yingyeothon/naive-redis/lib/connection";
 import redisQueuePush from "@yingyeothon/actor-system-redis-support/lib/queue/push";
 
 const connection = redisConnect({
-  host: `my.redis.domain`
+  host: `my.redis.domain`,
 });
 await actorEnqueue(
   {
     id: `adder-1`,
-    queue: redisQueuePush({ connection })
+    queue: redisQueuePush({ connection }),
   },
   { item: { delta: 1 } }
 );

@@ -1,3 +1,3 @@
-export default interface IActorErrorHandler {
-  onError?: (error: Error) => any | Promise<any>;
+export default interface ActorErrorHandler {
+  onError?: (error: Error) => unknown | Promise<unknown>;
 }

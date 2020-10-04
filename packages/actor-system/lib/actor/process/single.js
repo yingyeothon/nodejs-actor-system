@@ -9,10 +9,10 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-const logger_1 = require("@yingyeothon/logger");
-const notifyCompletion_1 = require("../awaiter/notifyCompletion");
-const awaitPolicy_1 = require("../message/awaitPolicy");
 const utils_1 = require("./utils");
+const awaitPolicy_1 = require("../message/awaitPolicy");
+const notifyCompletion_1 = require("../awaiter/notifyCompletion");
+const logger_1 = require("@yingyeothon/logger");
 function processInSingleMode(env, isAlive) {
     return __awaiter(this, void 0, void 0, function* () {
         if (!isAlive()) {

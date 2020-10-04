@@ -1,26 +1,28 @@
 import * as Actor from "@yingyeothon/actor-system";
-import { ActorSendEnvironment } from "@yingyeothon/actor-system/lib/actor/send";
-import { ILogger, nullLogger } from "@yingyeothon/logger";
+
 import { APIGatewayProxyEvent, APIGatewayProxyHandler } from "aws-lambda";
+import { LogWriter, nullLogger } from "@yingyeothon/logger";
+
+import { ActorSendEnvironment } from "@yingyeothon/actor-system/lib/actor/send";
 
 const defaultAPIProxyFunctionTimeoutMillis = 5 * 1000;
 
-interface IActorAPIEventHandlerArguments<T> {
+interface ActorAPIEventHandlerArguments<T> {
   newActorEnv: (
     apiPath: string,
     event: APIGatewayProxyEvent
   ) => ActorSendEnvironment<T>;
   parseMessage?: (body: string) => T;
-  logger?: ILogger;
+  logger?: LogWriter;
   policy:
     | {
         type: "send";
-        messageMeta?: Partial<Actor.IAwaiterMeta>;
-        processOptions?: Partial<Actor.IActorProcessOptions>;
+        messageMeta?: Partial<Actor.AwaiterMeta>;
+        processOptions?: Partial<Actor.ActorProcessOptions>;
       }
     | {
         type: "post";
-        messageMeta?: Actor.IAwaiterMeta;
+        messageMeta?: Actor.AwaiterMeta;
       };
 }
 
@@ -28,10 +30,10 @@ export const handleActorAPIEvent = <T>({
   newActorEnv,
   parseMessage: maybeParseMessage,
   logger: maybeLogger,
-  policy
-}: IActorAPIEventHandlerArguments<
-  T
->): APIGatewayProxyHandler => async event => {
+  policy,
+}: ActorAPIEventHandlerArguments<T>): APIGatewayProxyHandler => async (
+  event
+) => {
   const parseMessage =
     maybeParseMessage || ((body: string) => JSON.parse(body) as T);
   const logger = maybeLogger || nullLogger;
@@ -61,7 +63,7 @@ export const handleActorAPIEvent = <T>({
   }
 
   logger.debug(`actor-api-handler`, `post-and-process`, actorEnv.id, message);
-  let processed: any;
+  let processed: unknown;
   switch (policy.type) {
     case "send":
       processed = await Actor.send(
@@ -73,7 +75,7 @@ export const handleActorAPIEvent = <T>({
     case "post":
       processed = await Actor.post(actorEnv, {
         ...(policy.messageMeta || {}),
-        item: message
+        item: message,
       });
       break;
   }
@@ -83,17 +85,17 @@ export const handleActorAPIEvent = <T>({
 };
 
 const prepareProcessOptions = (
-  options?: Actor.IActorProcessOptions
-): Actor.IActorProcessOptions =>
+  options?: Actor.ActorProcessOptions
+): Actor.ActorProcessOptions =>
   options
     ? {
         aliveMillis:
           options.aliveMillis ?? defaultAPIProxyFunctionTimeoutMillis,
         oneShot: options.oneShot ?? true,
-        shiftable: options.shiftable ?? true
+        shiftable: options.shiftable ?? true,
       }
     : {
         aliveMillis: defaultAPIProxyFunctionTimeoutMillis,
         oneShot: true,
-        shiftable: true
+        shiftable: true,
       };

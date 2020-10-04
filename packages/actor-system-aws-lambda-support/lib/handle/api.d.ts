@@ -1,19 +1,19 @@
 import * as Actor from "@yingyeothon/actor-system";
+import { APIGatewayProxyEvent, APIGatewayProxyHandler } from "aws-lambda";
+import { LogWriter } from "@yingyeothon/logger";
 import { ActorSendEnvironment } from "@yingyeothon/actor-system/lib/actor/send";
-import { ILogger } from "@yingyeothon/logger";
-import { APIGatewayProxyEvent } from "aws-lambda";
-interface IActorAPIEventHandlerArguments<T> {
+interface ActorAPIEventHandlerArguments<T> {
     newActorEnv: (apiPath: string, event: APIGatewayProxyEvent) => ActorSendEnvironment<T>;
     parseMessage?: (body: string) => T;
-    logger?: ILogger;
+    logger?: LogWriter;
     policy: {
         type: "send";
-        messageMeta?: Partial<Actor.IAwaiterMeta>;
-        processOptions?: Partial<Actor.IActorProcessOptions>;
+        messageMeta?: Partial<Actor.AwaiterMeta>;
+        processOptions?: Partial<Actor.ActorProcessOptions>;
     } | {
         type: "post";
-        messageMeta?: Actor.IAwaiterMeta;
+        messageMeta?: Actor.AwaiterMeta;
     };
 }
-export declare const handleActorAPIEvent: <T>({ newActorEnv, parseMessage: maybeParseMessage, logger: maybeLogger, policy }: IActorAPIEventHandlerArguments<T>) => import("aws-lambda").Handler<APIGatewayProxyEvent, import("aws-lambda").APIGatewayProxyResult>;
+export declare const handleActorAPIEvent: <T>({ newActorEnv, parseMessage: maybeParseMessage, logger: maybeLogger, policy, }: ActorAPIEventHandlerArguments<T>) => APIGatewayProxyHandler;
 export {};

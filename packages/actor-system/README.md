@@ -13,7 +13,7 @@ import * as InMemorySupport from "@yingyeothon/actor-system/lib/support/inmemory
 const subsys = {
   queue: new InMemorySupport.InMemoryQueue(),
   lock: new InMemorySupport.InMemoryLock(),
-  awaiter: new InMemorySupport.InMemoryAwaiter()
+  awaiter: new InMemorySupport.InMemoryAwaiter(),
 };
 
 class Adder {
@@ -46,7 +46,7 @@ It supports `awaitPolicy` that determines how long I should wait. `Forget` is de
 Actor.send(env, {
   item: { delta: 10 },
   awaitPolicy: Actor.AwaitPolicy.Act,
-  awaitTimeoutMillis: 100
+  awaitTimeoutMillis: 100,
 })
   .then(/* HAPPY */) // It would be called after `onMessage`.
   .catch(/* SAD */);
@@ -79,7 +79,7 @@ const env = { ...Actor.singleConsumer, ...subsys, ...new Adder(`adder-1`) };
 Actor.send(env, {
   item: { delta: 10 },
   awaitPolicy: Actor.AwaitPolicy.Commit,
-  awaitTimeoutMillis: 1000
+  awaitTimeoutMillis: 1000,
 })
   .then(/* HAPPY */) // It would be called after `onCommit`.
   .catch(/* SAD */);
@@ -95,12 +95,12 @@ await Actor.post(
   {
     id: `adder-1`,
     awaiter: {
-      wait: subsys.awaiter.wait
+      wait: subsys.awaiter.wait,
     },
     queue: {
-      push: subsys.queue.push
+      push: subsys.queue.push,
     },
-    logger: subsys.logger // optional
+    logger: subsys.logger, // optional
   },
   { item: { delta: 10 } }
 )
@@ -112,9 +112,9 @@ Actor.enqueue(
   {
     id: adder.id,
     queue: {
-      push: actorSubsys.queue.push
+      push: actorSubsys.queue.push,
     },
-    logger: actorSubsys.logger // optional
+    logger: actorSubsys.logger, // optional
   },
   { item: { delta: 1 } }
 )
@@ -129,7 +129,7 @@ class Adder {
   constructor(public readonly id: string) {}
 
   // It can process multiple messages at one time.
-  public onMessages = (messages: Array<{ delta: number }>) => {
+  public onMessages = (messages: { delta: number }[]) => {
     for (const message of messages) {
       this.value += message.delta;
     }
@@ -150,14 +150,14 @@ const subsysWithShift = {
   ...subsys,
   shift: async (actorId: string) => {
     // Invoke a new AWS Lambda to process remaining messages in this actor.
-  }
+  },
 };
 
 const env = { ...Actor.singleConsumer, ...subsys, ...new Adder(`adder-shift`) };
 Actor.send(
   env,
   {
-    item: { delta: 10 }
+    item: { delta: 10 },
   },
   { aliveMillis: 5 * 1000, shiftable: true } // A usual timeout of API Gateway
 );
@@ -176,7 +176,7 @@ import * as InMemorySupport from "@yingyeothon/actor-system/lib/support/inmemory
 const subsys = {
   queue: new InMemorySupport.InMemoryQueue(),
   lock: new InMemorySupport.InMemoryLock(),
-  awaiter: new InMemorySupport.InMemoryAwaiter()
+  awaiter: new InMemorySupport.InMemoryAwaiter(),
 };
 
 class Game {
@@ -192,14 +192,14 @@ class Game {
 
 const subsys = {
   queue: new InMemorySupport.InMemoryQueue(),
-  lock: new InMemorySupport.InMemoryLock()
+  lock: new InMemorySupport.InMemoryLock(),
 };
 
 async function main() {
   const game = new Game("GAME_ID");
   await Actor.eventLoop<GameMessage>({
     ...subsys,
-    ...game
+    ...game,
   });
 }
 
@@ -207,7 +207,7 @@ async function sendMessage(gameId: string, message: GameMessage) {
   await Actor.enqueue(
     {
       ...subsys,
-      id: gameId
+      id: gameId,
     },
     { item: message }
   );

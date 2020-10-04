@@ -12,17 +12,17 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const logger_1 = require("@yingyeothon/logger");
 const set_1 = require("@yingyeothon/naive-redis/lib/set");
 const locked = "1";
-function tryAcquire({ connection, keyPrefix, logger = logger_1.nullLogger, lockTimeout = -1 }) {
+function tryAcquire({ connection, keyPrefix, logger = logger_1.nullLogger, lockTimeout = -1, }) {
     return {
         tryAcquire: (actorId) => __awaiter(this, void 0, void 0, function* () {
             const redisKey = keyPrefix + actorId;
             const success = yield set_1.default(connection, redisKey, locked, {
                 expirationMillis: lockTimeout > 0 ? lockTimeout : undefined,
-                onlySet: "nx"
+                onlySet: "nx",
             });
             logger.debug(`redis-lock`, `try-acquire`, redisKey, success);
             return success;
-        })
+        }),
     };
 }
 exports.default = tryAcquire;

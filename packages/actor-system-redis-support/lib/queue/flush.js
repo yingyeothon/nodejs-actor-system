@@ -13,7 +13,7 @@ const codec_1 = require("@yingyeothon/codec");
 const logger_1 = require("@yingyeothon/logger");
 const lrange_1 = require("@yingyeothon/naive-redis/lib/lrange");
 const ltrim_1 = require("@yingyeothon/naive-redis/lib/ltrim");
-function flush({ connection, keyPrefix = "", codec = new codec_1.JsonCodec(), logger = logger_1.nullLogger }) {
+function flush({ connection, keyPrefix = "", codec = new codec_1.JsonCodec(), logger = logger_1.nullLogger, }) {
     return {
         flush: (actorId) => __awaiter(this, void 0, void 0, function* () {
             const redisKey = keyPrefix + actorId;
@@ -22,11 +22,11 @@ function flush({ connection, keyPrefix = "", codec = new codec_1.JsonCodec(), lo
                 logger.debug(`redis-queue`, `flush`, redisKey, `empty`);
                 return [];
             }
-            const decoded = values.map(value => codec.decode(value));
+            const decoded = values.map((value) => codec.decode(value));
             logger.debug(`redis-queue`, `flush`, redisKey, decoded);
             yield ltrim_1.default(connection, redisKey, values.length, -1);
             return decoded;
-        })
+        }),
     };
 }
 exports.default = flush;

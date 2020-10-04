@@ -9,10 +9,10 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-const logger_1 = require("@yingyeothon/logger");
-const notifyCompletions_1 = require("../awaiter/notifyCompletions");
-const awaitPolicy_1 = require("../message/awaitPolicy");
 const utils_1 = require("./utils");
+const awaitPolicy_1 = require("../message/awaitPolicy");
+const notifyCompletions_1 = require("../awaiter/notifyCompletions");
+const logger_1 = require("@yingyeothon/logger");
 function processInBulkMode(env, isAlive) {
     return __awaiter(this, void 0, void 0, function* () {
         const { queue, id, logger = logger_1.nullLogger, onMessages, onError } = env;
@@ -26,7 +26,7 @@ function processInBulkMode(env, isAlive) {
             }
             try {
                 logger.debug(`actor`, `process-messages`, id, messages);
-                yield utils_1.maybeAwait(onMessages(messages.map(message => message.item)));
+                yield utils_1.maybeAwait(onMessages(messages.map((message) => message.item)));
             }
             catch (error) {
                 logger.error(`actor`, `process-messages-error`, id, messages, error);
@@ -37,7 +37,7 @@ function processInBulkMode(env, isAlive) {
             for (const message of messages) {
                 messageMetas.push(utils_1.copyAwaiterMeta(message));
             }
-            notifyCompletions_1.default(env, messageMetas.filter(meta => meta.awaitPolicy === awaitPolicy_1.default.Act));
+            notifyCompletions_1.default(env, messageMetas.filter((meta) => meta.awaitPolicy === awaitPolicy_1.default.Act));
         }
         return messageMetas;
     });

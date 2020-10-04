@@ -1,7 +1,7 @@
-import IAwaiterWait from "../../awaiter/wait";
-import IActorLogger from "../env/logger";
-import IActorProperty from "../env/property";
-import IAwaiterMeta from "../message/awaiterMeta";
-export default function awaitMessageAfterTryToProcess(env: IActorProperty & IActorLogger & {
-    awaiter: IAwaiterWait;
-}, currentMeta: IAwaiterMeta, tryToProcess: () => Promise<IAwaiterMeta[]>): Promise<boolean>;
+import ActorLogger from "../env/logger";
+import ActorProperty from "../env/property";
+import AwaiterMeta from "../message/awaiterMeta";
+import AwaiterWait from "../../awaiter/wait";
+export default function awaitMessageAfterTryToProcess(env: ActorProperty & ActorLogger & {
+    awaiter: AwaiterWait;
+}, currentMeta: AwaiterMeta, tryToProcess: () => Promise<AwaiterMeta[]>): Promise<boolean>;

@@ -1,9 +1,9 @@
-import IAwaiterWait from "../awaiter/wait";
 import { ActorEnqueueEnvironment } from "./enqueue";
-import IActorProperty from "./env/property";
-import IUserMessageItem from "./message/userMessageItem";
-import IUserMessageMeta from "./message/userMessageMeta";
-export declare type ActorPostEnvironment = IActorProperty & ActorEnqueueEnvironment & {
-    awaiter: IAwaiterWait;
+import ActorProperty from "./env/property";
+import AwaiterWait from "../awaiter/wait";
+import UserMessageItem from "./message/userMessageItem";
+import UserMessageMeta from "./message/userMessageMeta";
+export declare type ActorPostEnvironment = ActorProperty & ActorEnqueueEnvironment & {
+    awaiter: AwaiterWait;
 };
-export default function post<T>(env: ActorPostEnvironment, input: IUserMessageItem<T> & Partial<IUserMessageMeta>): Promise<boolean>;
+export default function post<T>(env: ActorPostEnvironment, input: UserMessageItem<T> & Partial<UserMessageMeta>): Promise<boolean>;

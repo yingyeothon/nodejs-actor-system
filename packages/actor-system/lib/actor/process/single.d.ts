@@ -1,14 +1,14 @@
-import IAwaiterResolve from "../../awaiter/resolve";
-import IQueueLength from "../../queue/length";
-import IQueueSingleConsumer from "../../queue/singleConsumer";
-import IActorErrorHandler from "../env/errorHandler";
-import IActorLogger from "../env/logger";
-import IActorProperty from "../env/property";
-import IActorSingleMessageHandler from "../env/singleMessageHandler";
-import IAwaiterMeta from "../message/awaiterMeta";
-export declare type ActorSingleEnv<T> = IActorProperty & IActorLogger & {
-    queue: IQueueSingleConsumer & IQueueLength;
+import ActorErrorHandler from "../env/errorHandler";
+import ActorLogger from "../env/logger";
+import ActorProperty from "../env/property";
+import ActorSingleMessageHandler from "../env/singleMessageHandler";
+import AwaiterMeta from "../message/awaiterMeta";
+import AwaiterResolve from "../../awaiter/resolve";
+import QueueLength from "../../queue/length";
+import QueueSingleConsumer from "../../queue/singleConsumer";
+export declare type ActorSingleEnv<T> = ActorProperty & ActorLogger & {
+    queue: QueueSingleConsumer & QueueLength;
 } & {
-    awaiter: IAwaiterResolve;
-} & IActorSingleMessageHandler<T> & IActorErrorHandler;
-export default function processInSingleMode<T>(env: ActorSingleEnv<T>, isAlive: () => boolean): Promise<IAwaiterMeta[]>;
+    awaiter: AwaiterResolve;
+} & ActorSingleMessageHandler<T> & ActorErrorHandler;
+export default function processInSingleMode<T>(env: ActorSingleEnv<T>, isAlive: () => boolean): Promise<AwaiterMeta[]>;

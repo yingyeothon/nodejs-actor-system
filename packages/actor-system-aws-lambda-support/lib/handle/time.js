@@ -1,5 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.globalTimeline = exports.Timeline = void 0;
 class Timeline {
     constructor() {
         this.epochMillis = Date.now();

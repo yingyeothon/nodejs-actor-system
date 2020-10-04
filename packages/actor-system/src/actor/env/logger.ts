@@ -1,5 +1,5 @@
-import { ILogger } from "@yingyeothon/logger";
+import { Logger } from "@yingyeothon/logger";
 
-export default interface IActorLogger {
-  logger?: ILogger;
+export default interface ActorLogger {
+  logger?: Logger;
 }

@@ -9,9 +9,9 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-const awaitMessage_1 = require("./awaiter/awaitMessage");
 const enqueue_1 = require("./enqueue");
 const awaitPolicy_1 = require("./message/awaitPolicy");
+const awaitMessage_1 = require("./awaiter/awaitMessage");
 function post(env, input) {
     return __awaiter(this, void 0, void 0, function* () {
         const message = yield enqueue_1.default(env, input);

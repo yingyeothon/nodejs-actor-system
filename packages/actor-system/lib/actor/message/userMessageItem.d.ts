@@ -1,3 +1,3 @@
-export default interface IUserMessageItem<T> {
+export default interface UserMessageItem<T> {
     item: T;
 }

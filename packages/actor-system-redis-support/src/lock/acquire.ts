@@ -1,6 +1,7 @@
+import { LogWriter, nullLogger } from "@yingyeothon/logger";
+
 import ILockAcquire from "@yingyeothon/actor-system/lib/lock/tryAcquire";
-import { ILogger, nullLogger } from "@yingyeothon/logger";
-import { IRedisConnection } from "@yingyeothon/naive-redis/lib/connection";
+import { RedisConnection } from "@yingyeothon/naive-redis/lib/connection";
 import set from "@yingyeothon/naive-redis/lib/set";
 
 const locked = "1";
@@ -9,11 +10,11 @@ export default function tryAcquire({
   connection,
   keyPrefix,
   logger = nullLogger,
-  lockTimeout = -1
+  lockTimeout = -1,
 }: {
-  connection: IRedisConnection;
+  connection: RedisConnection;
   keyPrefix?: string;
-  logger?: ILogger;
+  logger?: LogWriter;
   lockTimeout?: number;
 }): ILockAcquire {
   return {
@@ -21,11 +22,11 @@ export default function tryAcquire({
       const redisKey = keyPrefix + actorId;
       const success = await set(connection, redisKey, locked, {
         expirationMillis: lockTimeout > 0 ? lockTimeout : undefined,
-        onlySet: "nx"
+        onlySet: "nx",
       });
 
       logger.debug(`redis-lock`, `try-acquire`, redisKey, success);
       return success;
-    }
+    },
   };
 }

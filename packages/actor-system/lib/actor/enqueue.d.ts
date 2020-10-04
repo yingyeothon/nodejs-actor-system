@@ -1,10 +1,10 @@
-import IQueueProducer from "../queue/producer";
-import IActorLogger from "./env/logger";
-import IActorProperty from "./env/property";
-import IUserMessage from "./message/userMessage";
-import IUserMessageItem from "./message/userMessageItem";
-import IUserMessageMeta from "./message/userMessageMeta";
-export declare type ActorEnqueueEnvironment = IActorProperty & IActorLogger & {
-    queue: IQueueProducer;
+import ActorLogger from "./env/logger";
+import ActorProperty from "./env/property";
+import QueueProducer from "../queue/producer";
+import UserMessage from "./message/userMessage";
+import UserMessageItem from "./message/userMessageItem";
+import UserMessageMeta from "./message/userMessageMeta";
+export declare type ActorEnqueueEnvironment = ActorProperty & ActorLogger & {
+    queue: QueueProducer;
 };
-export default function enqueue<T>(env: ActorEnqueueEnvironment, input: IUserMessageItem<T> & Partial<IUserMessageMeta>): Promise<IUserMessage<T>>;
+export default function enqueue<T>(env: ActorEnqueueEnvironment, input: UserMessageItem<T> & Partial<UserMessageMeta>): Promise<UserMessage<T>>;

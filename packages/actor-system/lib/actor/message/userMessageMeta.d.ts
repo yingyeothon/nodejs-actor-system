@@ -1,3 +1,3 @@
-import IAwaiterMeta from "./awaiterMeta";
-export default interface IUserMessageMeta extends IAwaiterMeta {
+import AwaiterMeta from "./awaiterMeta";
+export default interface UserMessageMeta extends AwaiterMeta {
 }

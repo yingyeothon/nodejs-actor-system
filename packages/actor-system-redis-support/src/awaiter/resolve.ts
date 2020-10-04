@@ -1,31 +1,32 @@
+import { LogWriter, nullLogger } from "@yingyeothon/logger";
+import { Resolved, asRedisKey } from "./basis";
+
 import IAwaiterResolve from "@yingyeothon/actor-system/lib/awaiter/resolve";
-import { ILogger, nullLogger } from "@yingyeothon/logger";
-import { IRedisConnection } from "@yingyeothon/naive-redis/lib/connection";
+import { RedisConnection } from "@yingyeothon/naive-redis/lib/connection";
 import set from "@yingyeothon/naive-redis/lib/set";
-import { asRedisKey, Resolved } from "./basis";
 
 const TimeoutMillisForResolved = 1000;
 
 export default function resolve({
   connection,
   keyPrefix = "",
-  logger = nullLogger
+  logger = nullLogger,
 }: {
-  connection: IRedisConnection;
+  connection: RedisConnection;
   keyPrefix?: string;
-  logger?: ILogger;
+  logger?: LogWriter;
 }): IAwaiterResolve {
   return {
     resolve: async (actorId: string, messageId: string) => {
       const redisKey = asRedisKey(keyPrefix, actorId, messageId);
       try {
         const success = await set(connection, redisKey, Resolved, {
-          expirationMillis: TimeoutMillisForResolved
+          expirationMillis: TimeoutMillisForResolved,
         });
         logger.debug(`redis-awaiter`, `resolve`, redisKey, success);
       } catch (error) {
         logger.debug(`redis-awaiter`, `resolve`, redisKey, `error`, error);
       }
-    }
+    },
   };
 }

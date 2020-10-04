@@ -1,10 +1,12 @@
-import { ConsoleLogger } from "@yingyeothon/logger";
 import * as Actor from "../src";
+
 import {
   InMemoryAwaiter,
   InMemoryLock,
-  InMemoryQueue
+  InMemoryQueue,
 } from "../src/support/inmemory";
+
+import { ConsoleLogger } from "@yingyeothon/logger";
 
 interface IAdderMessage {
   delta: number;
@@ -14,11 +16,11 @@ const actorSubsys = {
   queue: new InMemoryQueue(),
   lock: new InMemoryLock(),
   awaiter: new InMemoryAwaiter(),
-  logger: new ConsoleLogger(`debug`)
+  logger: new ConsoleLogger(`debug`),
 };
 
 class Adder {
-  public value: number = 0;
+  public value = 0;
   public state: undefined | "prepared" | "committed";
 
   constructor(public readonly id: string) {}

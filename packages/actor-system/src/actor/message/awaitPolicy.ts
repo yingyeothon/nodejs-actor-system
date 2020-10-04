@@ -21,7 +21,7 @@ enum AwaitPolicy {
    * It will ensure that my message would be completed perfectly,
    * but because of this it may take a long time.
    */
-  Commit
+  Commit,
 }
 
 export default AwaitPolicy;

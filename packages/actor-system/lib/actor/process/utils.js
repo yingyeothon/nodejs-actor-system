@@ -9,20 +9,27 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.maybeAwait = (result) => __awaiter(void 0, void 0, void 0, function* () {
-    if (!result) {
-        return;
-    }
-    if (result instanceof Promise) {
-        yield result;
-    }
-    if (result.constructor.name === "Promise") {
-        yield result;
-    }
-});
-exports.copyAwaiterMeta = (input) => ({
-    messageId: input.messageId,
-    awaitPolicy: input.awaitPolicy,
-    awaitTimeoutMillis: input.awaitTimeoutMillis
-});
+exports.copyAwaiterMeta = exports.maybeAwait = void 0;
+function maybeAwait(result) {
+    return __awaiter(this, void 0, void 0, function* () {
+        if (!result) {
+            return;
+        }
+        if (result instanceof Promise) {
+            yield result;
+        }
+        if (result.constructor.name === "Promise") {
+            yield result;
+        }
+    });
+}
+exports.maybeAwait = maybeAwait;
+function copyAwaiterMeta(input) {
+    return {
+        messageId: input.messageId,
+        awaitPolicy: input.awaitPolicy,
+        awaitTimeoutMillis: input.awaitTimeoutMillis,
+    };
+}
+exports.copyAwaiterMeta = copyAwaiterMeta;
 //# sourceMappingURL=utils.js.map

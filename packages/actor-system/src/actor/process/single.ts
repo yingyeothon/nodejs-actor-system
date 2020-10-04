@@ -1,27 +1,28 @@
-import { nullLogger } from "@yingyeothon/logger";
-import IAwaiterResolve from "../../awaiter/resolve";
-import IQueueLength from "../../queue/length";
-import IQueueSingleConsumer from "../../queue/singleConsumer";
-import notifyCompletion from "../awaiter/notifyCompletion";
-import IActorErrorHandler from "../env/errorHandler";
-import IActorLogger from "../env/logger";
-import IActorProperty from "../env/property";
-import IActorSingleMessageHandler from "../env/singleMessageHandler";
-import IAwaiterMeta from "../message/awaiterMeta";
-import AwaitPolicy from "../message/awaitPolicy";
-import IUserMessage from "../message/userMessage";
 import { copyAwaiterMeta, maybeAwait } from "./utils";
 
-export type ActorSingleEnv<T> = IActorProperty &
-  IActorLogger & { queue: IQueueSingleConsumer & IQueueLength } & {
-    awaiter: IAwaiterResolve;
-  } & IActorSingleMessageHandler<T> &
-  IActorErrorHandler;
+import ActorErrorHandler from "../env/errorHandler";
+import ActorLogger from "../env/logger";
+import ActorProperty from "../env/property";
+import ActorSingleMessageHandler from "../env/singleMessageHandler";
+import AwaitPolicy from "../message/awaitPolicy";
+import AwaiterMeta from "../message/awaiterMeta";
+import AwaiterResolve from "../../awaiter/resolve";
+import QueueLength from "../../queue/length";
+import QueueSingleConsumer from "../../queue/singleConsumer";
+import UserMessage from "../message/userMessage";
+import notifyCompletion from "../awaiter/notifyCompletion";
+import { nullLogger } from "@yingyeothon/logger";
+
+export type ActorSingleEnv<T> = ActorProperty &
+  ActorLogger & { queue: QueueSingleConsumer & QueueLength } & {
+    awaiter: AwaiterResolve;
+  } & ActorSingleMessageHandler<T> &
+  ActorErrorHandler;
 
 export default async function processInSingleMode<T>(
   env: ActorSingleEnv<T>,
   isAlive: () => boolean
-) {
+): Promise<AwaiterMeta[]> {
   if (!isAlive()) {
     return [];
   }
@@ -45,17 +46,17 @@ export default async function processInSingleMode<T>(
 const processQueueInLock = async <T>(
   env: ActorSingleEnv<T>,
   isAlive: () => boolean
-): Promise<IAwaiterMeta[]> => {
+): Promise<AwaiterMeta[]> => {
   const { queue, id, logger = nullLogger } = env;
 
   logger.debug(`actor`, `process-queue-in-single`, id);
 
   // Process messages as possible as it can while alive.
-  const messageMetas: IAwaiterMeta[] = [];
-  const notifyPromises: Array<Promise<void>> = [];
+  const messageMetas: AwaiterMeta[] = [];
+  const notifyPromises: Promise<void>[] = [];
   while (isAlive() && (await queue.size(id)) > 0) {
     // Step 1. Peek a message from the queue to process it.
-    const message = await queue.peek<IUserMessage<any>>(id);
+    const message = await queue.peek<UserMessage<T>>(id);
     logger.debug(`actor`, `get-message`, id, message);
 
     // Step 1-1. We should stop to process when the queue is broken.
@@ -86,7 +87,7 @@ const processQueueInLock = async <T>(
 
 const processMessage = async <T>(
   env: ActorSingleEnv<T>,
-  message: IUserMessage<any>
+  message: UserMessage<T>
 ): Promise<void> => {
   const { id, logger = nullLogger, onMessage, onError } = env;
   try {

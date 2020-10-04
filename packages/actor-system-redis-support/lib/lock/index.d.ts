@@ -1,16 +1,16 @@
-import ILockRelease from "@yingyeothon/actor-system/lib/lock/release";
-import ILockAcquire from "@yingyeothon/actor-system/lib/lock/tryAcquire";
-import { ILogger } from "@yingyeothon/logger";
-import { IRedisConnection } from "@yingyeothon/naive-redis/lib/connection";
-interface IRedisLockArguments {
-    connection: IRedisConnection;
+import LockAcquire from "@yingyeothon/actor-system/lib/lock/tryAcquire";
+import LockRelease from "@yingyeothon/actor-system/lib/lock/release";
+import { LogWriter } from "@yingyeothon/logger";
+import { RedisConnection } from "@yingyeothon/naive-redis/lib/connection";
+interface RedisLockArguments {
+    connection: RedisConnection;
     keyPrefix?: string;
-    logger?: ILogger;
+    logger?: LogWriter;
     lockTimeout?: number;
 }
-export declare class RedisLock implements ILockAcquire, ILockRelease {
+export declare class RedisLock implements LockAcquire, LockRelease {
     tryAcquire: (actorId: string) => Promise<boolean>;
     release: (actorId: string) => Promise<boolean>;
-    constructor(args: IRedisLockArguments);
+    constructor(args: RedisLockArguments);
 }
 export {};

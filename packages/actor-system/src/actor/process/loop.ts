@@ -1,23 +1,24 @@
-import { nullLogger } from "@yingyeothon/logger";
-import ILockRelease from "../../lock/release";
-import ILockAcquire from "../../lock/tryAcquire";
-import notifyCompletions from "../awaiter/notifyCompletions";
-import IAwaiterMeta from "../message/awaiterMeta";
-import AwaitPolicy from "../message/awaitPolicy";
 import processInBulkMode, { ActorBulkEnv } from "./bulk";
 import processInSingleMode, { ActorSingleEnv } from "./single";
 
+import AwaitPolicy from "../message/awaitPolicy";
+import AwaiterMeta from "../message/awaiterMeta";
+import LockAcquire from "../../lock/tryAcquire";
+import LockRelease from "../../lock/release";
+import notifyCompletions from "../awaiter/notifyCompletions";
+import { nullLogger } from "@yingyeothon/logger";
+
 export type ActorLoopEnvironment<T> = (ActorSingleEnv<T> | ActorBulkEnv<T>) & {
-  lock: ILockAcquire & ILockRelease;
+  lock: LockAcquire & LockRelease;
 };
 
 export default async function processLoop<T>(
   env: ActorLoopEnvironment<T>,
   isAlive: () => boolean
-): Promise<IAwaiterMeta[]> {
+): Promise<AwaiterMeta[]> {
   const { id, queue, lock, logger = nullLogger } = env;
 
-  const messageMetas: IAwaiterMeta[] = [];
+  const messageMetas: AwaiterMeta[] = [];
   logger.debug(`actor`, `process-loop`, id);
   while (isAlive()) {
     // Do nothing if cannot get the lock.
@@ -27,7 +28,7 @@ export default async function processLoop<T>(
       break;
     }
 
-    let localMetas: IAwaiterMeta[] = [];
+    let localMetas: AwaiterMeta[] = [];
     switch (env._consume) {
       case "single":
         localMetas = await processInSingleMode(env, isAlive);
@@ -45,7 +46,7 @@ export default async function processLoop<T>(
     // Notify the end of process to awaiters.
     await notifyCompletions(
       env,
-      messageMetas.filter(meta => meta.awaitPolicy === AwaitPolicy.Commit)
+      messageMetas.filter((meta) => meta.awaitPolicy === AwaitPolicy.Commit)
     );
 
     // There is no messages in the queue after unlocked,

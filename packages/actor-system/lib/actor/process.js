@@ -9,9 +9,9 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-const logger_1 = require("@yingyeothon/logger");
 const loop_1 = require("./process/loop");
 const utils_1 = require("./process/utils");
+const logger_1 = require("@yingyeothon/logger");
 function tryToProcess(env, { oneShot, aliveMillis, shiftable } = {}) {
     return __awaiter(this, void 0, void 0, function* () {
         const { logger = logger_1.nullLogger, id, shift } = env;

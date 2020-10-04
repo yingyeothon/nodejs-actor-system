@@ -1,13 +1,13 @@
+import ActorLogger from "../env/logger";
+import ActorProperty from "../env/property";
+import AwaiterWait from "../../awaiter/wait";
 import { nullLogger } from "@yingyeothon/logger";
-import IAwaiterWait from "../../awaiter/wait";
-import IActorLogger from "../env/logger";
-import IActorProperty from "../env/property";
 
 export default async function awaitMessage(
-  env: IActorProperty & IActorLogger & { awaiter: IAwaiterWait },
+  env: ActorProperty & ActorLogger & { awaiter: AwaiterWait },
   messageId: string,
   awaitTimeoutMillis: number
-) {
+): Promise<boolean> {
   const { id, awaiter, logger = nullLogger } = env;
   logger.debug(`actor`, `await-message`, id, messageId, awaitTimeoutMillis);
   return awaiter.wait(id, messageId, awaitTimeoutMillis);

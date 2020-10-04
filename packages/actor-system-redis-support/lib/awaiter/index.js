@@ -1,5 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.RedisAwaiter = void 0;
 const resolve_1 = require("./resolve");
 const wait_1 = require("./wait");
 class RedisAwaiter {

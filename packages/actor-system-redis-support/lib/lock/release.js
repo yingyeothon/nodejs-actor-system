@@ -11,14 +11,14 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", { value: true });
 const logger_1 = require("@yingyeothon/logger");
 const del_1 = require("@yingyeothon/naive-redis/lib/del");
-function release({ connection, keyPrefix, logger = logger_1.nullLogger }) {
+function release({ connection, keyPrefix, logger = logger_1.nullLogger, }) {
     return {
         release: (actorId) => __awaiter(this, void 0, void 0, function* () {
             const redisKey = keyPrefix + actorId;
             yield del_1.default(connection, redisKey);
             logger.debug(`redis-lock`, `release`, redisKey);
             return true;
-        })
+        }),
     };
 }
 exports.default = release;

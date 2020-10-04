@@ -1,13 +1,14 @@
-import IAwaiterWait from "../awaiter/wait";
-import awaitMessageAfterTryToProcess from "./awaiter/awaitMessageAfterTryToProcess";
 import enqueue, { ActorEnqueueEnvironment } from "./enqueue";
-import IUserMessageItem from "./message/userMessageItem";
-import IUserMessageMeta from "./message/userMessageMeta";
 import tryToProcess, { ActorProcessEnvironment } from "./process";
-import IActorProcessOptions from "./process/options";
+
+import ActorProcessOptions from "./process/options";
+import AwaiterWait from "../awaiter/wait";
+import UserMessageItem from "./message/userMessageItem";
+import UserMessageMeta from "./message/userMessageMeta";
+import awaitMessageAfterTryToProcess from "./awaiter/awaitMessageAfterTryToProcess";
 
 export type ActorSendEnvironment<T> = ActorEnqueueEnvironment &
-  ActorProcessEnvironment<T> & { awaiter: IAwaiterWait };
+  ActorProcessEnvironment<T> & { awaiter: AwaiterWait };
 
 /**
  * Send a message to this `Actor` and try to process that message with `ProcessOptions`.
@@ -18,8 +19,8 @@ export type ActorSendEnvironment<T> = ActorEnqueueEnvironment &
  */
 export default async function send<T>(
   env: ActorSendEnvironment<T>,
-  input: IUserMessageItem<T> & Partial<IUserMessageMeta>,
-  options: IActorProcessOptions = {}
+  input: UserMessageItem<T> & Partial<UserMessageMeta>,
+  options: ActorProcessOptions = {}
 ): Promise<boolean> {
   const message = await enqueue(env, input);
   return awaitMessageAfterTryToProcess(env, message, () =>

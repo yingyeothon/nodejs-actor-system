@@ -1,16 +1,16 @@
 import { ConsoleLogger } from "@yingyeothon/logger";
-import { testRedis } from ".";
 import { RedisQueue } from "..";
+import { testRedis } from ".";
 
 interface IKeyValue {
   key: string;
   value: string;
 }
 
-testRedis("queue", async connection => {
+testRedis("queue", async (connection) => {
   const queue = new RedisQueue({
     connection,
-    logger: new ConsoleLogger(`debug`)
+    logger: new ConsoleLogger(`debug`),
   });
   const actorId = "test-actor";
 

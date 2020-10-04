@@ -1,8 +1,8 @@
-import IQueueLength from "@yingyeothon/actor-system/lib/queue/length";
-import { ILogger } from "@yingyeothon/logger";
-import { IRedisConnection } from "@yingyeothon/naive-redis/lib/connection";
-export default function size({ connection, keyPrefix, logger }: {
-    connection: IRedisConnection;
+import { LogWriter } from "@yingyeothon/logger";
+import QueueLength from "@yingyeothon/actor-system/lib/queue/length";
+import { RedisConnection } from "@yingyeothon/naive-redis/lib/connection";
+export default function size({ connection, keyPrefix, logger, }: {
+    connection: RedisConnection;
     keyPrefix?: string;
-    logger?: ILogger;
-}): IQueueLength;
+    logger?: LogWriter;
+}): QueueLength;

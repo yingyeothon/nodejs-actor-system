@@ -9,9 +9,9 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+const awaitPolicy_1 = require("./message/awaitPolicy");
 const logger_1 = require("@yingyeothon/logger");
 const uuid_1 = require("uuid");
-const awaitPolicy_1 = require("./message/awaitPolicy");
 function enqueue(env, input) {
     return __awaiter(this, void 0, void 0, function* () {
         const { id, queue, logger = logger_1.nullLogger } = env;
@@ -19,7 +19,7 @@ function enqueue(env, input) {
             messageId: input.messageId || uuid_1.v4(),
             awaitPolicy: input.awaitPolicy || awaitPolicy_1.default.Forget,
             item: input.item,
-            awaitTimeoutMillis: input.awaitTimeoutMillis || 0
+            awaitTimeoutMillis: input.awaitTimeoutMillis || 0,
         };
         yield queue.push(id, message);
         logger.debug(`actor`, `enqueue`, id, message);

@@ -19,7 +19,7 @@ function notifyCompletions(env, metas) {
             if (targetIds.length === 0) {
                 return;
             }
-            yield Promise.all(targetIds.map(messageId => awaiter.resolve(id, messageId)));
+            yield Promise.all(targetIds.map((messageId) => awaiter.resolve(id, messageId)));
         }
         catch (error) {
             logger.error(`actor`, `awaiter-resolve-error`, id, error);

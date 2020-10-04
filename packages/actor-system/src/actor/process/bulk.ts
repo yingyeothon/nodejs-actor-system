@@ -1,34 +1,35 @@
-import { nullLogger } from "@yingyeothon/logger";
-import IAwaiterResolve from "../../awaiter/resolve";
-import IQueueBulkConsumer from "../../queue/bulkConsumer";
-import IQueueLength from "../../queue/length";
-import notifyCompletions from "../awaiter/notifyCompletions";
-import IActorBulkMessageHandler from "../env/bulkMessageHandler";
-import IActorErrorHandler from "../env/errorHandler";
-import IActorLogger from "../env/logger";
-import IActorProperty from "../env/property";
-import IAwaiterMeta from "../message/awaiterMeta";
-import AwaitPolicy from "../message/awaitPolicy";
-import IUserMessage from "../message/userMessage";
 import { copyAwaiterMeta, maybeAwait } from "./utils";
 
-export type ActorBulkEnv<T> = IActorProperty &
-  IActorLogger & { queue: IQueueBulkConsumer & IQueueLength } & {
-    awaiter: IAwaiterResolve;
-  } & IActorBulkMessageHandler<T> &
-  IActorErrorHandler;
+import ActorBulkMessageHandler from "../env/bulkMessageHandler";
+import ActorErrorHandler from "../env/errorHandler";
+import ActorLogger from "../env/logger";
+import ActorProperty from "../env/property";
+import AwaitPolicy from "../message/awaitPolicy";
+import AwaiterMeta from "../message/awaiterMeta";
+import AwaiterResolve from "../../awaiter/resolve";
+import QueueBulkConsumer from "../../queue/bulkConsumer";
+import QueueLength from "../../queue/length";
+import UserMessage from "../message/userMessage";
+import notifyCompletions from "../awaiter/notifyCompletions";
+import { nullLogger } from "@yingyeothon/logger";
+
+export type ActorBulkEnv<T> = ActorProperty &
+  ActorLogger & { queue: QueueBulkConsumer & QueueLength } & {
+    awaiter: AwaiterResolve;
+  } & ActorBulkMessageHandler<T> &
+  ActorErrorHandler;
 
 export default async function processInBulkMode<T>(
   env: ActorBulkEnv<T>,
   isAlive: () => boolean
-) {
+): Promise<AwaiterMeta[]> {
   const { queue, id, logger = nullLogger, onMessages, onError } = env;
   logger.debug(`actor`, `process-queue-in-bulk`, id);
 
   // Process messages as possible as it can while alive.
-  const messageMetas: IAwaiterMeta[] = [];
+  const messageMetas: AwaiterMeta[] = [];
   while (isAlive()) {
-    const messages: Array<IUserMessage<any>> = await queue.flush(id);
+    const messages: UserMessage<T>[] = await queue.flush(id);
     logger.debug(`actor`, `get-messages`, id, messages.length);
     if (messages.length === 0) {
       break;
@@ -37,7 +38,7 @@ export default async function processInBulkMode<T>(
     // Step 2. Process messages.
     try {
       logger.debug(`actor`, `process-messages`, id, messages);
-      await maybeAwait(onMessages(messages.map(message => message.item)));
+      await maybeAwait(onMessages(messages.map((message) => message.item)));
     } catch (error) {
       logger.error(`actor`, `process-messages-error`, id, messages, error);
       if (onError) {
@@ -53,7 +54,7 @@ export default async function processInBulkMode<T>(
     // Step 3. Notify completions to awaiters.
     notifyCompletions(
       env,
-      messageMetas.filter(meta => meta.awaitPolicy === AwaitPolicy.Act)
+      messageMetas.filter((meta) => meta.awaitPolicy === AwaitPolicy.Act)
     );
   }
   return messageMetas;

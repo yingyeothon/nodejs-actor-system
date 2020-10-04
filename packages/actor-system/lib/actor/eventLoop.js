@@ -21,7 +21,7 @@ function eventLoop(env) {
         const poll = () => __awaiter(this, void 0, void 0, function* () {
             const messages = yield queue.flush(id);
             logger.debug(`actor`, `poll-messages`, id, messages.length);
-            return messages.map(message => message.item);
+            return messages.map((message) => message.item);
         });
         logger.debug(`actor`, `start-loop`, id);
         yield loop(poll);

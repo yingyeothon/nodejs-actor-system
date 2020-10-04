@@ -1,17 +1,17 @@
-import IAwaiterResolve from "@yingyeothon/actor-system/lib/awaiter/resolve";
-import IAwaiterWait from "@yingyeothon/actor-system/lib/awaiter/wait";
-import { ILogger } from "@yingyeothon/logger";
-import { IRedisConnection } from "@yingyeothon/naive-redis/lib/connection";
+import AwaiterResolve from "@yingyeothon/actor-system/lib/awaiter/resolve";
+import AwaiterWait from "@yingyeothon/actor-system/lib/awaiter/wait";
+import { LogWriter } from "@yingyeothon/logger";
+import { RedisConnection } from "@yingyeothon/naive-redis/lib/connection";
 import resolve from "./resolve";
 import wait from "./wait";
 
-interface IRedisAwaiterArguments {
-  connection: IRedisConnection;
+interface RedisAwaiterArguments {
+  connection: RedisConnection;
   keyPrefix?: string;
-  logger?: ILogger;
+  logger?: LogWriter;
 }
 
-export class RedisAwaiter implements IAwaiterResolve, IAwaiterWait {
+export class RedisAwaiter implements AwaiterResolve, AwaiterWait {
   public wait: (
     actorId: string,
     messageId: string,
@@ -19,7 +19,7 @@ export class RedisAwaiter implements IAwaiterResolve, IAwaiterWait {
   ) => Promise<boolean>;
   public resolve: (actorId: string, messageId: string) => Promise<void>;
 
-  constructor(args: IRedisAwaiterArguments) {
+  constructor(args: RedisAwaiterArguments) {
     const awaiter = { ...wait(args), ...resolve(args) };
     for (const key of Object.keys(awaiter)) {
       this[key] = awaiter[key];

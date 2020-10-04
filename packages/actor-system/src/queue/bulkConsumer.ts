@@ -1,3 +1,3 @@
-export default interface IQueueBulkConsumer {
+export default interface QueueBulkConsumer {
   flush: <T>(actorId: string) => Promise<T[]>;
 }

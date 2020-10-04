@@ -1,4 +1,4 @@
-import IAwaiterMeta from "./awaiterMeta";
+import AwaiterMeta from "./awaiterMeta";
 
-// tslint:disable-next-line:no-empty-interface
-export default interface IUserMessageMeta extends IAwaiterMeta {}
+// eslint-disable-next-line @typescript-eslint/no-empty-interface
+export default interface UserMessageMeta extends AwaiterMeta {}

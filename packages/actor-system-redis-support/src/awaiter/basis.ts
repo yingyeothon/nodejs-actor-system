@@ -1,7 +1,9 @@
 export const Resolved = "1";
 
-export const asRedisKey = (
+export function asRedisKey(
   keyPrefix: string,
   actorId: string,
   messageId: string
-) => `${keyPrefix}${actorId}/${messageId}`;
+): string {
+  return `${keyPrefix}${actorId}/${messageId}`;
+}

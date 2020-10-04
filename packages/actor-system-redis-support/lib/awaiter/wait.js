@@ -10,11 +10,11 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const logger_1 = require("@yingyeothon/logger");
-const get_1 = require("@yingyeothon/naive-redis/lib/get");
 const basis_1 = require("./basis");
+const get_1 = require("@yingyeothon/naive-redis/lib/get");
 const SleepIntervalMillisForAwaiting = 50;
-const sleep = (millis) => new Promise(resolve => setTimeout(resolve, millis));
-function wait({ connection, keyPrefix = "", logger = logger_1.nullLogger }) {
+const sleep = (millis) => new Promise((resolve) => setTimeout(resolve, millis));
+function wait({ connection, keyPrefix = "", logger = logger_1.nullLogger, }) {
     return {
         wait: (actorId, messageId, timeoutMillis) => __awaiter(this, void 0, void 0, function* () {
             logger.debug(`redis-awaiter`, `wait`, messageId, timeoutMillis);
@@ -41,7 +41,7 @@ function wait({ connection, keyPrefix = "", logger = logger_1.nullLogger }) {
                     reject(error);
                 }
             }));
-        })
+        }),
     };
 }
 exports.default = wait;

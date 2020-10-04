@@ -12,42 +12,41 @@ Many of things would be deployed to [npmjs](https://www.npmjs.com/org/yingyeotho
 
 ## Development
 
-It uses [`lerna`](https://github.com/lerna/lerna) to manage multiple packages.
+It uses `yarn workspace` for monorepo.
 
 ### Create a new
 
 - Execute `create` command and copy `tsconfig.json` file from any other project.
 
 ```bash
-lerna create new-package
+mkdir -p packages/new-package
 cd packages/new-package
-cp ../codec/tsconfig.json .
-ln -s ../../tslint.json .
-ln -s ../../jest.config.js .
-ln -s ../../.vscode .
+yarn init
+cp ../actor-system/tsconfig.json .
+ln -s ../../.eslint* .
+cp ../../jest.config.js .
+cp -r ../../.vscode .
 ```
 
-- Fill `package.json` file referencing any other project. Should fill up `typings`, `publishConfig` and `scripts.[tsc, build, test]`.
+- Fill `package.json` file referencing any other project. Should fill up `typings`, `publishConfig` and `scripts.[build, test]`.
 
 ### Write a code and build
 
 - Write its codes.
-- Build with `lerna run tsc`.
+- Add a shortcut `yarn workspace package-name` into `package.json` at root directory.
+- Build with `yarn package-name build`.
 
-If you want to build the only one package, please use `npm run build` in the specific package directory.
+If you want to build the only one package, please use `yarn build` in the specific package directory.
 
 ### Test
 
-Write some test codes that import a library from JavaScript that built by `tsc`. Run `npm run test` command on **its root directory**.
+Write some test codes that import a library from JavaScript that built by `tsc`. Run `yarn package-name test`.
 
-If you want to test the only one package, please use `npm run test` in the specific package directory.
+If you want to test the only one package, please use `yarn test` in the specific package directory.
 
 ### Use other packages
 
-If a package would reference other packages,
-
-- First, `npm i --save @yingyeothon/package-name`.
-- And do `lerna bootstrap`. It will make a symbolic link of a referenced package on its `node_modules` directory.
+If a package would reference other packages, do `yarn add @yingyeothon/package-name@version`.
 
 ### Publish
 
@@ -55,8 +54,8 @@ If a package would reference other packages,
 - Check if it can build to JavaScript properly.
 - Check if it passes all tests we write.
 - Check the version of this package.
-- `npm publish` If you want to deploy it as alone.
-- Or if you want to deploy all of them, do `npm run build` and `npm run deploy` at the root directory that deploy all things after build and test them.
+- `yarn publish` If you want to deploy it as alone.
+- Or if you want to deploy all of them, do `yarn workspaces run publish` at the root directory that deploy all things after build and test them.
 
 ## License
 

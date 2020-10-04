@@ -1,10 +1,10 @@
-import IQueueProducer from "@yingyeothon/actor-system/lib/queue/producer";
-import { ICodec } from "@yingyeothon/codec";
-import { ILogger } from "@yingyeothon/logger";
-import { IRedisConnection } from "@yingyeothon/naive-redis/lib/connection";
-export default function push({ connection, keyPrefix, codec, logger }: {
-    connection: IRedisConnection;
+import { Codec } from "@yingyeothon/codec";
+import { LogWriter } from "@yingyeothon/logger";
+import QueueProducer from "@yingyeothon/actor-system/lib/queue/producer";
+import { RedisConnection } from "@yingyeothon/naive-redis/lib/connection";
+export default function push({ connection, keyPrefix, codec, logger, }: {
+    connection: RedisConnection;
     keyPrefix?: string;
-    codec?: ICodec<string>;
-    logger?: ILogger;
-}): IQueueProducer;
+    codec?: Codec<string>;
+    logger?: LogWriter;
+}): QueueProducer;

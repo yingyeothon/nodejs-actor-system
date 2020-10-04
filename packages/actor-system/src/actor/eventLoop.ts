@@ -1,14 +1,14 @@
-import { nullLogger } from "@yingyeothon/logger";
-import ILockRelease from "../lock/release";
-import ILockAcquire from "../lock/tryAcquire";
+import ActorLogger from "./env/logger";
+import ActorProperty from "./env/property";
+import LockAcquire from "../lock/tryAcquire";
+import LockRelease from "../lock/release";
 import QueueBulkConsumer from "../queue/bulkConsumer";
-import IActorLogger from "./env/logger";
-import IActorProperty from "./env/property";
-import IUserMessage from "./message/userMessage";
+import UserMessage from "./message/userMessage";
+import { nullLogger } from "@yingyeothon/logger";
 
-export type ActroEventLoopEnvironment<T> = IActorProperty &
-  IActorLogger & {
-    lock: ILockAcquire & ILockRelease;
+export type ActroEventLoopEnvironment<T> = ActorProperty &
+  ActorLogger & {
+    lock: LockAcquire & LockRelease;
   } & {
     queue: QueueBulkConsumer;
   } & {
@@ -28,9 +28,9 @@ export default async function eventLoop<T>(
   }
 
   const poll = async () => {
-    const messages: Array<IUserMessage<T>> = await queue.flush(id);
+    const messages: UserMessage<T>[] = await queue.flush(id);
     logger.debug(`actor`, `poll-messages`, id, messages.length);
-    return messages.map(message => message.item);
+    return messages.map((message) => message.item);
   };
 
   logger.debug(`actor`, `start-loop`, id);

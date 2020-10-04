@@ -1,3 +1,3 @@
-export default interface ILockAcquire {
+export default interface LockAcquire {
   tryAcquire: (actorId: string) => Promise<boolean>;
 }

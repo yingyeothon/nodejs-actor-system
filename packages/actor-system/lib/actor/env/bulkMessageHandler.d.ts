@@ -1,4 +1,4 @@
-export default interface IActorMessageBulkConsumer<T> {
+export default interface ActorMessageBulkConsumer<T> {
     _consume: "bulk";
-    onMessages: (messages: T[]) => any | Promise<any>;
+    onMessages: (messages: T[]) => unknown | Promise<unknown>;
 }

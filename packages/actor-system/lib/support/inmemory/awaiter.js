@@ -16,7 +16,7 @@ class InMemoryAwaiter {
     wait(actorId, messageId, timeoutMillis) {
         return __awaiter(this, void 0, void 0, function* () {
             const id = actorId + messageId;
-            return new Promise(resolve => {
+            return new Promise((resolve) => {
                 this.resolvers[id] = resolve;
                 if (timeoutMillis > 0) {
                     setTimeout(() => this.finish(id, false), timeoutMillis);

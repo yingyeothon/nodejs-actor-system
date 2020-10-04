@@ -1,10 +1,10 @@
-import ILockRelease from "../lock/release";
-import ILockAcquire from "../lock/tryAcquire";
+import ActorLogger from "./env/logger";
+import ActorProperty from "./env/property";
+import LockAcquire from "../lock/tryAcquire";
+import LockRelease from "../lock/release";
 import QueueBulkConsumer from "../queue/bulkConsumer";
-import IActorLogger from "./env/logger";
-import IActorProperty from "./env/property";
-export declare type ActroEventLoopEnvironment<T> = IActorProperty & IActorLogger & {
-    lock: ILockAcquire & ILockRelease;
+export declare type ActroEventLoopEnvironment<T> = ActorProperty & ActorLogger & {
+    lock: LockAcquire & LockRelease;
 } & {
     queue: QueueBulkConsumer;
 } & {

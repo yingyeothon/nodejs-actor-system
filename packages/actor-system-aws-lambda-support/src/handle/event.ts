@@ -1,3 +1,3 @@
-export interface IActorLambdaEvent {
+export interface ActorLambdaEvent {
   actorId: string;
 }

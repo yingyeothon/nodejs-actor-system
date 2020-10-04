@@ -1,10 +1,12 @@
-import { ConsoleLogger } from "@yingyeothon/logger";
 import * as Actor from "../src";
+
 import {
   InMemoryAwaiter,
   InMemoryLock,
-  InMemoryQueue
+  InMemoryQueue,
 } from "../src/support/inmemory";
+
+import { ConsoleLogger } from "@yingyeothon/logger";
 
 interface IAdderMessage {
   delta: number;
@@ -14,11 +16,11 @@ const actorSubsys = {
   queue: new InMemoryQueue(),
   lock: new InMemoryLock(),
   awaiter: new InMemoryAwaiter(),
-  logger: new ConsoleLogger(`debug`)
+  logger: new ConsoleLogger(`debug`),
 };
 
 class Adder {
-  public value: number = 0;
+  public value = 0;
   public state: undefined | "prepared" | "committed";
 
   constructor(public readonly id: string) {}
@@ -35,7 +37,7 @@ test("adder-await", async () => {
   const env = {
     ...Actor.singleConsumer,
     ...actorSubsys,
-    ...adder
+    ...adder,
   };
 
   expect(adder.state).toBeUndefined();
@@ -43,14 +45,14 @@ test("adder-await", async () => {
 
   await Actor.send(env, {
     item: { delta: 1 },
-    awaitPolicy: Actor.AwaitPolicy.Commit
+    awaitPolicy: Actor.AwaitPolicy.Commit,
   });
   expect(adder.state).toEqual("committed");
   expect(adder.value).toEqual(1);
 
   await Actor.send(env, {
     item: { delta: 1 },
-    awaitPolicy: Actor.AwaitPolicy.Commit
+    awaitPolicy: Actor.AwaitPolicy.Commit,
   });
   expect(adder.state).toEqual("committed");
   expect(adder.value).toEqual(2);
@@ -63,7 +65,7 @@ test("adder-await", async () => {
 
   await Actor.post(env, {
     item: { delta: 1 },
-    awaitPolicy: Actor.AwaitPolicy.Commit
+    awaitPolicy: Actor.AwaitPolicy.Commit,
   });
   orderSet.push("second");
   expect(adder.state).toEqual("committed");
