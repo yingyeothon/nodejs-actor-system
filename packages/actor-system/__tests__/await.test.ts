@@ -8,7 +8,7 @@ import {
 
 import { ConsoleLogger } from "@yingyeothon/logger";
 
-interface IAdderMessage {
+interface AdderMessage {
   delta: number;
 }
 
@@ -27,7 +27,7 @@ class Adder {
 
   public onPrepare = () => (this.state = "prepared");
   public onCommit = () => (this.state = "committed");
-  public onMessage = ({ delta }: IAdderMessage) => {
+  public onMessage = ({ delta }: AdderMessage) => {
     this.value += delta;
   };
 }

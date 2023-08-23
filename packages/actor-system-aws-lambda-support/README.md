@@ -12,25 +12,34 @@ import * as Actor from "@yingyeothon/actor-system";
 import {
   shiftToNextLambda,
   handleActorAPIEvent,
-  handleActorLambdaEvent
+  handleActorLambdaEvent,
 } from "@yingyeothon/actor-system-aws-lambda-support";
 import * as RedisSupport from "@yingyeothon/actor-system-redis-support";
 import { RedisRepository } from "@yingyeothon/repository-redis";
-import * as IORedis from "ioredis";
+import redisConnect from "@yingyeothon/naive-redis/lib/connect";
 
 // Define subsystems for Actor
-const redis = new IORedis();
-const subsys: Actor.IActorSubsystem = {
-  queue: new RedisSupport.RedisQueue({ redis }),
-  lock: new RedisSupport.RedisLock({ redis }),
-  awaiter: new RedisSupport.RedisAwaiter({ redis }),
+const connection = redisConnect({
+  host: `my.redis.domain`,
+  port: 6379,
+  password: `very-secret`,
+  timeoutMillis: 1000,
+});
+
+const subsys = {
+  ...RedisSupport.newRedisSubsystem({ connection }),
   shift: shiftToNextLambda({
-    functionName: process.env.BOTTOM_HALF_LAMBDA!
-  })
+    functionName: process.env.BOTTOM_HALF_LAMBDA!,
+  }),
 };
 
+// Keep a state using Redis.
+const repo = new RedisRepository({
+  redisConnection: connection,
+  prefix: "adder:",
+});
+
 // Define a context and handlers for Actor
-const repo = new RedisRepository({ redis });
 class Adder {
   private value = 0;
 
@@ -47,12 +56,16 @@ class Adder {
 }
 
 // This is a function to build a new actor from its id.
-const newActor = (actorId: string) => Actor.newEnv(subsys)(new Adder(actorId));
+const newActor = (actorId: string) => ({
+  ...Actor.singleConsumer,
+  ...actorSubsys,
+  ...new Adder(actorId),
+});
 
 // To receive a message via API Gateway
 // and process it as possible as it can like top-half.
 export const sendActorMessage = handleActorAPIEvent({
-  newActorEnv: apiPath => newActor(apiPath),
+  newActorEnv: (apiPath) => newActor(apiPath),
   policy: {
     // This handler will try to process the message as soon as it sends to the actor.
     type: "send",
@@ -60,7 +73,7 @@ export const sendActorMessage = handleActorAPIEvent({
     // Wait up to 2 seconds for the message to be processed and committed.
     messageMeta: {
       awaitPolicy: Actor.AwaitPolicy.Commit,
-      awaitTimeoutMillis: 2 * 1000
+      awaitTimeoutMillis: 2 * 1000,
     },
 
     /*
@@ -71,14 +84,14 @@ export const sendActorMessage = handleActorAPIEvent({
     processOptions: {
       aliveMillis: 500,
       oneShot: true,
-      shiftable: true
-    }
-  }
+      shiftable: true,
+    },
+  },
 });
 
 // To process remaining messages in Lambda that invoked
 // by other lifetime-exhausted Lambda or Lambda Proxy.
-export const processBottomHalf = handleActorLambdaEvent<IActorLambdaEvent>({
+export const processBottomHalf = handleActorLambdaEvent({
   newActorEnv: ({ actorId }) => newActor(actorId),
 
   /*
@@ -89,8 +102,8 @@ export const processBottomHalf = handleActorLambdaEvent<IActorLambdaEvent>({
   processOptions: {
     aliveMillis: 30 * 1000,
     oneShot: false,
-    shiftable: true
-  }
+    shiftable: true,
+  },
 });
 ```
 

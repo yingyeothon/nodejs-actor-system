@@ -8,7 +8,7 @@ import {
 
 import { ConsoleLogger } from "@yingyeothon/logger";
 
-interface IAdderMessage {
+interface AdderMessage {
   delta: number;
 }
 
@@ -24,7 +24,7 @@ class Adder {
 
   constructor(public readonly id: string) {}
 
-  public onMessages = (messages: IAdderMessage[]) => {
+  public onMessages = (messages: AdderMessage[]) => {
     for (const { delta } of messages) {
       this.value += delta;
     }

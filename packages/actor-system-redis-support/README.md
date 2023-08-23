@@ -12,27 +12,22 @@ Using Redis-based queue and lock instead of In-memory-based one, it can support 
 import * as Actor from "@yingyeothon/actor-system";
 import * as RedisSupport from "@yingyeothon/actor-system-redis-support";
 import { RedisRepository } from "@yingyeothon/repository-redis";
-import connect, {
-  IRedisConnection
-} from "@yingyeothon/naive-redis/lib/connect";
--import * as IORedis from "ioredis";
+import redisConnect from "@yingyeothon/naive-redis/lib/connect";
 
-const connection = connect({
+const connection = redisConnect({
   host: `my.redis.domain`,
   port: 6379,
   password: `very-secret`,
-  timeoutMillis: 1000
+  timeoutMillis: 1000,
 });
 
-const subsys: Actor.IActorSubsystem = {
-  queue: new RedisSupport.RedisQueue({ connection }),
-  lock: new RedisSupport.RedisLock({ connection }),
-  awaiter: new RedisSupport.RedisAwaiter({ connection })
-};
+const subsys = RedisSupport.newRedisSubsystem({ connection });
 
 // Keep a state using Redis.
-const redis = new IORedis();
-const repo = new RedisRepository({ redis, prefix: "adder:" });
+const repo = new RedisRepository({
+  redisConnection: connection,
+  prefix: "adder:",
+});
 class Adder {
   private value = 0;
 

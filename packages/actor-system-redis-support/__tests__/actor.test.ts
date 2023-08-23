@@ -4,7 +4,7 @@ import { ConsoleLogger } from "@yingyeothon/logger";
 import { newRedisSubsystem } from "../src";
 import { testRedis } from ".";
 
-interface IAdderMessage {
+interface AdderMessage {
   delta: number;
 }
 
@@ -16,7 +16,7 @@ class Adder {
 
   public onPrepare = () => (this.state = "prepared");
   public onCommit = () => (this.state = "committed");
-  public onMessage = (message: IAdderMessage) => (this.value += message.delta);
+  public onMessage = (message: AdderMessage) => (this.value += message.delta);
 }
 
 testRedis("simple-actor", async (connection) => {

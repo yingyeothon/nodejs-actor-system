@@ -2,7 +2,7 @@ import { ConsoleLogger } from "@yingyeothon/logger";
 import { RedisQueue } from "..";
 import { testRedis } from ".";
 
-interface IKeyValue {
+interface KeyValue {
   key: string;
   value: string;
 }
@@ -18,8 +18,8 @@ testRedis("queue", async (connection) => {
   expect(await queue.peek(actorId)).toBe(null);
   expect(await queue.pop(actorId)).toBe(null);
 
-  const tuple1: IKeyValue = { key: "hello", value: "world" };
-  const tuple2: IKeyValue = { key: "hi", value: "there" };
+  const tuple1: KeyValue = { key: "hello", value: "world" };
+  const tuple2: KeyValue = { key: "hi", value: "there" };
 
   await queue.push(actorId, tuple1);
   expect(await queue.size(actorId)).toBe(1);
