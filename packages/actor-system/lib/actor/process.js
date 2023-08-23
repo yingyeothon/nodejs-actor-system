@@ -22,12 +22,12 @@ function tryToProcess(env, { oneShot, aliveMillis, shiftable } = {}) {
             : true;
         const metas = [];
         while (isAlive()) {
-            const localMetas = yield loop_1.default(env, isAlive);
+            const localMetas = yield (0, loop_1.default)(env, isAlive);
             Array.prototype.push.apply(metas, localMetas);
             if (!isAlive() && shiftable) {
                 logger.debug(`actor`, `shift-timeout`, id);
                 if (shift) {
-                    yield utils_1.maybeAwait(shift(id));
+                    yield (0, utils_1.maybeAwait)(shift(id));
                 }
                 break;
             }

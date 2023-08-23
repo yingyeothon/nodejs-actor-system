@@ -17,14 +17,14 @@ function flush({ connection, keyPrefix = "", codec = new codec_1.JsonCodec(), lo
     return {
         flush: (actorId) => __awaiter(this, void 0, void 0, function* () {
             const redisKey = keyPrefix + actorId;
-            const values = yield lrange_1.default(connection, redisKey, 0, -1);
+            const values = yield (0, lrange_1.default)(connection, redisKey, 0, -1);
             if (!values || values.length === 0) {
                 logger.debug(`redis-queue`, `flush`, redisKey, `empty`);
                 return [];
             }
             const decoded = values.map((value) => codec.decode(value));
             logger.debug(`redis-queue`, `flush`, redisKey, decoded);
-            yield ltrim_1.default(connection, redisKey, values.length, -1);
+            yield (0, ltrim_1.default)(connection, redisKey, values.length, -1);
             return decoded;
         }),
     };

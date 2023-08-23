@@ -28,16 +28,16 @@ function processLoop(env, isAlive) {
             let localMetas = [];
             switch (env._consume) {
                 case "single":
-                    localMetas = yield single_1.default(env, isAlive);
+                    localMetas = yield (0, single_1.default)(env, isAlive);
                     break;
                 case "bulk":
-                    localMetas = yield bulk_1.default(env, isAlive);
+                    localMetas = yield (0, bulk_1.default)(env, isAlive);
                     break;
             }
             Array.prototype.push.apply(messageMetas, localMetas);
             logger.debug(`actor`, `release-lock`, id);
             yield lock.release(id);
-            yield notifyCompletions_1.default(env, messageMetas.filter((meta) => meta.awaitPolicy === awaitPolicy_1.default.Commit));
+            yield (0, notifyCompletions_1.default)(env, messageMetas.filter((meta) => meta.awaitPolicy === awaitPolicy_1.default.Commit));
             if ((yield queue.size(id)) === 0) {
                 logger.debug(`actor`, `empty-queue`, id);
                 break;

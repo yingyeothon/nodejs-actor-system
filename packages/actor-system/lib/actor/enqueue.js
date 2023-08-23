@@ -16,7 +16,7 @@ function enqueue(env, input) {
     return __awaiter(this, void 0, void 0, function* () {
         const { id, queue, logger = logger_1.nullLogger } = env;
         const message = {
-            messageId: input.messageId || uuid_1.v4(),
+            messageId: input.messageId || (0, uuid_1.v4)(),
             awaitPolicy: input.awaitPolicy || awaitPolicy_1.default.Forget,
             item: input.item,
             awaitTimeoutMillis: input.awaitTimeoutMillis || 0,

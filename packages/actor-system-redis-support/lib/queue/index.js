@@ -7,7 +7,7 @@ const push_1 = require("./push");
 const size_1 = require("./size");
 class RedisQueue {
     constructor(args) {
-        const queue = Object.assign(Object.assign(Object.assign(Object.assign({}, size_1.default(args)), pop_1.default(args)), push_1.default(args)), flush_1.default(args));
+        const queue = Object.assign(Object.assign(Object.assign(Object.assign({}, (0, size_1.default)(args)), (0, pop_1.default)(args)), (0, push_1.default)(args)), (0, flush_1.default)(args));
         for (const key of Object.keys(queue)) {
             this[key] = queue[key];
         }

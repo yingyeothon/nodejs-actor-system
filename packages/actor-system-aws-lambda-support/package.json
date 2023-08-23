@@ -1,6 +1,6 @@
 {
   "name": "@yingyeothon/actor-system-aws-lambda-support",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "description": "AWS Lambda support for actor system such as simple handler and lambda invoker.",
   "keywords": [
     "aws",

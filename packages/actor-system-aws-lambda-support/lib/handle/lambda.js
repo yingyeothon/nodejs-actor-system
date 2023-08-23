@@ -11,31 +11,39 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.shiftToNextLambda = exports.handleActorLambdaEvent = void 0;
 const Actor = require("@yingyeothon/actor-system");
+const client_lambda_1 = require("@aws-sdk/client-lambda");
 const logger_1 = require("@yingyeothon/logger");
-const aws_sdk_1 = require("aws-sdk");
 const time_1 = require("./time");
 const defaultLambdaFunctionTimeoutMillis = 870 * 1000;
-exports.handleActorLambdaEvent = ({ newActorEnv, logger: maybeLogger, processOptions, }) => (event) => __awaiter(void 0, void 0, void 0, function* () {
-    time_1.globalTimeline.reset((processOptions === null || processOptions === void 0 ? void 0 : processOptions.aliveMillis) || defaultLambdaFunctionTimeoutMillis);
-    const logger = maybeLogger || logger_1.nullLogger;
-    logger.debug(`actor-lambda`, `handle`, processOptions, event);
-    const env = newActorEnv(event);
-    if (!env) {
-        throw new Error(`No actor env [${event}]`);
-    }
-    yield Actor.tryToProcess(env, processOptions || {
-        aliveMillis: time_1.globalTimeline.remainMillis,
-        oneShot: true,
-        shiftable: true,
-    });
-    logger.debug(`actor-lambda`, `end-of-handle`, processOptions, event);
-});
-exports.shiftToNextLambda = ({ functionName, functionVersion, buildPayload = (actorId) => ({ actorId }), }) => (actorId) => new aws_sdk_1.Lambda()
-    .invoke({
-    FunctionName: functionName,
-    InvocationType: "Event",
-    Qualifier: functionVersion || "$LATEST",
-    Payload: JSON.stringify(buildPayload(actorId)),
-})
-    .promise();
+function handleActorLambdaEvent({ newActorEnv, logger: maybeLogger, processOptions, }) {
+    return function handleLambda(event) {
+        return __awaiter(this, void 0, void 0, function* () {
+            time_1.globalTimeline.reset((processOptions === null || processOptions === void 0 ? void 0 : processOptions.aliveMillis) || defaultLambdaFunctionTimeoutMillis);
+            const env = newActorEnv(event);
+            const logger = maybeLogger || env.logger || logger_1.nullLogger;
+            logger.debug(`actor-lambda`, `handle`, processOptions, event);
+            if (!env) {
+                throw new Error(`No actor env [${event}]`);
+            }
+            yield Actor.tryToProcess(env, processOptions || {
+                aliveMillis: time_1.globalTimeline.remainMillis,
+                oneShot: true,
+                shiftable: true,
+            });
+            logger.debug(`actor-lambda`, `end-of-handle`, processOptions, event);
+        });
+    };
+}
+exports.handleActorLambdaEvent = handleActorLambdaEvent;
+function shiftToNextLambda({ functionName, functionVersion, buildPayload = (actorId) => ({ actorId }), }) {
+    return function (actorId) {
+        return new client_lambda_1.LambdaClient({}).send(new client_lambda_1.InvokeCommand({
+            FunctionName: functionName,
+            InvocationType: "Event",
+            Qualifier: functionVersion || "$LATEST",
+            Payload: Buffer.from(JSON.stringify(buildPayload(actorId)), "utf-8"),
+        }));
+    };
+}
+exports.shiftToNextLambda = shiftToNextLambda;
 //# sourceMappingURL=lambda.js.map

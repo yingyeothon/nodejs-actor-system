@@ -3,7 +3,7 @@ import ActorProperty from "./env/property";
 import LockAcquire from "../lock/tryAcquire";
 import LockRelease from "../lock/release";
 import QueueBulkConsumer from "../queue/bulkConsumer";
-export declare type ActroEventLoopEnvironment<T> = ActorProperty & ActorLogger & {
+export type ActroEventLoopEnvironment<T> = ActorProperty & ActorLogger & {
     lock: LockAcquire & LockRelease;
 } & {
     queue: QueueBulkConsumer;

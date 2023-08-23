@@ -15,5 +15,5 @@ interface ActorAPIEventHandlerArguments<T> {
         messageMeta?: Actor.AwaiterMeta;
     };
 }
-export declare const handleActorAPIEvent: <T>({ newActorEnv, parseMessage: maybeParseMessage, logger: maybeLogger, policy, }: ActorAPIEventHandlerArguments<T>) => APIGatewayProxyHandler;
+export declare function handleActorAPIEvent<T>({ newActorEnv, parseMessage: maybeParseMessage, logger: maybeLogger, policy, }: ActorAPIEventHandlerArguments<T>): APIGatewayProxyHandler;
 export {};

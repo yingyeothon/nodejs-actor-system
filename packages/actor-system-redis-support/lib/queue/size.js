@@ -15,7 +15,7 @@ function size({ connection, keyPrefix = "", logger = logger_1.nullLogger, }) {
     return {
         size: (actorId) => __awaiter(this, void 0, void 0, function* () {
             const redisKey = keyPrefix + actorId;
-            const length = yield llen_1.default(connection, redisKey);
+            const length = yield (0, llen_1.default)(connection, redisKey);
             logger.debug(`redis-queue`, `size`, redisKey, length);
             return length;
         }),

@@ -26,18 +26,18 @@ function processInBulkMode(env, isAlive) {
             }
             try {
                 logger.debug(`actor`, `process-messages`, id, messages);
-                yield utils_1.maybeAwait(onMessages(messages.map((message) => message.item)));
+                yield (0, utils_1.maybeAwait)(onMessages(messages.map((message) => message.item)));
             }
             catch (error) {
                 logger.error(`actor`, `process-messages-error`, id, messages, error);
                 if (onError) {
-                    yield utils_1.maybeAwait(onError(error));
+                    yield (0, utils_1.maybeAwait)(onError(error));
                 }
             }
             for (const message of messages) {
-                messageMetas.push(utils_1.copyAwaiterMeta(message));
+                messageMetas.push((0, utils_1.copyAwaiterMeta)(message));
             }
-            notifyCompletions_1.default(env, messageMetas.filter((meta) => meta.awaitPolicy === awaitPolicy_1.default.Act));
+            (0, notifyCompletions_1.default)(env, messageMetas.filter((meta) => meta.awaitPolicy === awaitPolicy_1.default.Act));
         }
         return messageMetas;
     });

@@ -20,7 +20,7 @@ function awaitMessageAfterTryToProcess(env, currentMeta, tryToProcess) {
         if (resolvedMetas.some((meta) => meta.messageId === currentMeta.messageId)) {
             return true;
         }
-        return awaitMessage_1.default(env, currentMeta.messageId, currentMeta.awaitTimeoutMillis);
+        return (0, awaitMessage_1.default)(env, currentMeta.messageId, currentMeta.awaitTimeoutMillis);
     });
 }
 exports.default = awaitMessageAfterTryToProcess;

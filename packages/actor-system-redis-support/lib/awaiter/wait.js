@@ -21,13 +21,13 @@ function wait({ connection, keyPrefix = "", logger = logger_1.nullLogger, }) {
             if (timeoutMillis <= 0) {
                 return false;
             }
-            const redisKey = basis_1.asRedisKey(keyPrefix, actorId, messageId);
+            const redisKey = (0, basis_1.asRedisKey)(keyPrefix, actorId, messageId);
             const start = Date.now();
             return new Promise((resolve, reject) => __awaiter(this, void 0, void 0, function* () {
                 try {
                     let remainMillis = 0;
                     do {
-                        const value = yield get_1.default(connection, redisKey);
+                        const value = yield (0, get_1.default)(connection, redisKey);
                         remainMillis = start + timeoutMillis - Date.now();
                         logger.debug(`redis-awaiter`, `wait`, redisKey, value, remainMillis);
                         if (value === basis_1.Resolved) {

@@ -16,9 +16,9 @@ const TimeoutMillisForResolved = 1000;
 function resolve({ connection, keyPrefix = "", logger = logger_1.nullLogger, }) {
     return {
         resolve: (actorId, messageId) => __awaiter(this, void 0, void 0, function* () {
-            const redisKey = basis_1.asRedisKey(keyPrefix, actorId, messageId);
+            const redisKey = (0, basis_1.asRedisKey)(keyPrefix, actorId, messageId);
             try {
-                const success = yield set_1.default(connection, redisKey, basis_1.Resolved, {
+                const success = yield (0, set_1.default)(connection, redisKey, basis_1.Resolved, {
                     expirationMillis: TimeoutMillisForResolved,
                 });
                 logger.debug(`redis-awaiter`, `resolve`, redisKey, success);

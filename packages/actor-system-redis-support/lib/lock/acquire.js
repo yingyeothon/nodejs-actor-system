@@ -16,7 +16,7 @@ function tryAcquire({ connection, keyPrefix, logger = logger_1.nullLogger, lockT
     return {
         tryAcquire: (actorId) => __awaiter(this, void 0, void 0, function* () {
             const redisKey = keyPrefix + actorId;
-            const success = yield set_1.default(connection, redisKey, locked, {
+            const success = yield (0, set_1.default)(connection, redisKey, locked, {
                 expirationMillis: lockTimeout > 0 ? lockTimeout : undefined,
                 onlySet: "nx",
             });

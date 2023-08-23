@@ -1,6 +1,6 @@
 {
   "name": "@yingyeothon/actor-system",
-  "version": "0.3.1",
+  "version": "0.4.0",
   "description": "A basic actor system only using a queue and a lock.",
   "keywords": [
     "actor"

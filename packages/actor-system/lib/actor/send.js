@@ -14,8 +14,8 @@ const process_1 = require("./process");
 const awaitMessageAfterTryToProcess_1 = require("./awaiter/awaitMessageAfterTryToProcess");
 function send(env, input, options = {}) {
     return __awaiter(this, void 0, void 0, function* () {
-        const message = yield enqueue_1.default(env, input);
-        return awaitMessageAfterTryToProcess_1.default(env, message, () => process_1.default(env, options));
+        const message = yield (0, enqueue_1.default)(env, input);
+        return (0, awaitMessageAfterTryToProcess_1.default)(env, message, () => (0, process_1.default)(env, options));
     });
 }
 exports.default = send;

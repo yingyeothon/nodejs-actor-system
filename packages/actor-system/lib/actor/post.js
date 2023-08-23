@@ -14,11 +14,11 @@ const awaitPolicy_1 = require("./message/awaitPolicy");
 const awaitMessage_1 = require("./awaiter/awaitMessage");
 function post(env, input) {
     return __awaiter(this, void 0, void 0, function* () {
-        const message = yield enqueue_1.default(env, input);
+        const message = yield (0, enqueue_1.default)(env, input);
         if (message.awaitPolicy === awaitPolicy_1.default.Forget) {
             return true;
         }
-        return awaitMessage_1.default(env, message.messageId, message.awaitTimeoutMillis);
+        return (0, awaitMessage_1.default)(env, message.messageId, message.awaitTimeoutMillis);
     });
 }
 exports.default = post;

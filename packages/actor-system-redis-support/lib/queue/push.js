@@ -17,7 +17,7 @@ function push({ connection, keyPrefix = "", codec = new codec_1.JsonCodec(), log
         push: function (actorId, item) {
             return __awaiter(this, void 0, void 0, function* () {
                 const redisKey = keyPrefix + actorId;
-                const pushed = yield rpush_1.default(connection, redisKey, codec.encode(item));
+                const pushed = yield (0, rpush_1.default)(connection, redisKey, codec.encode(item));
                 logger.debug(`redis-queue`, `push`, redisKey, item, pushed);
             });
         },

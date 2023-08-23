@@ -6,7 +6,7 @@ import AwaiterMeta from "../message/awaiterMeta";
 import AwaiterResolve from "../../awaiter/resolve";
 import QueueBulkConsumer from "../../queue/bulkConsumer";
 import QueueLength from "../../queue/length";
-export declare type ActorBulkEnv<T> = ActorProperty & ActorLogger & {
+export type ActorBulkEnv<T> = ActorProperty & ActorLogger & {
     queue: QueueBulkConsumer & QueueLength;
 } & {
     awaiter: AwaiterResolve;

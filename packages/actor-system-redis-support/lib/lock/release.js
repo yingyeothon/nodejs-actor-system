@@ -15,7 +15,7 @@ function release({ connection, keyPrefix, logger = logger_1.nullLogger, }) {
     return {
         release: (actorId) => __awaiter(this, void 0, void 0, function* () {
             const redisKey = keyPrefix + actorId;
-            yield del_1.default(connection, redisKey);
+            yield (0, del_1.default)(connection, redisKey);
             logger.debug(`redis-lock`, `release`, redisKey);
             return true;
         }),

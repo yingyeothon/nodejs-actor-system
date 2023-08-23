@@ -20,11 +20,11 @@ function processInSingleMode(env, isAlive) {
         }
         const { id, onPrepare, onCommit } = env;
         if (onPrepare) {
-            yield utils_1.maybeAwait(onPrepare(id));
+            yield (0, utils_1.maybeAwait)(onPrepare(id));
         }
         const localMetas = yield processQueueInLock(env, isAlive);
         if (onCommit) {
-            yield utils_1.maybeAwait(onCommit(id));
+            yield (0, utils_1.maybeAwait)(onCommit(id));
         }
         return localMetas;
     });
@@ -43,9 +43,9 @@ const processQueueInLock = (env, isAlive) => __awaiter(void 0, void 0, void 0, f
             break;
         }
         yield processMessage(env, message);
-        messageMetas.push(utils_1.copyAwaiterMeta(message));
+        messageMetas.push((0, utils_1.copyAwaiterMeta)(message));
         if (message.awaitPolicy === awaitPolicy_1.default.Act) {
-            notifyPromises.push(notifyCompletion_1.default(env, message));
+            notifyPromises.push((0, notifyCompletion_1.default)(env, message));
         }
         yield queue.pop(id);
         logger.debug(`actor`, `delete-message`, id);
@@ -57,12 +57,12 @@ const processMessage = (env, message) => __awaiter(void 0, void 0, void 0, funct
     const { id, logger = logger_1.nullLogger, onMessage, onError } = env;
     try {
         logger.debug(`actor`, `process-user-message`, id, message);
-        yield utils_1.maybeAwait(onMessage(message.item));
+        yield (0, utils_1.maybeAwait)(onMessage(message.item));
     }
     catch (error) {
         logger.error(`actor`, `process-user-message-error`, id, message, error);
         if (onError) {
-            yield utils_1.maybeAwait(onError(error));
+            yield (0, utils_1.maybeAwait)(onError(error));
         }
     }
 });

@@ -17,7 +17,7 @@ function pop({ connection, keyPrefix = "", codec = new codec_1.JsonCodec(), logg
     return {
         pop: (actorId) => __awaiter(this, void 0, void 0, function* () {
             const redisKey = keyPrefix + actorId;
-            const value = yield lpop_1.default(connection, redisKey);
+            const value = yield (0, lpop_1.default)(connection, redisKey);
             if (value === null) {
                 return null;
             }
@@ -27,7 +27,7 @@ function pop({ connection, keyPrefix = "", codec = new codec_1.JsonCodec(), logg
         }),
         peek: (actorId) => __awaiter(this, void 0, void 0, function* () {
             const redisKey = keyPrefix + actorId;
-            const value = yield lindex_1.default(connection, redisKey, 0);
+            const value = yield (0, lindex_1.default)(connection, redisKey, 0);
             if (value === null) {
                 return null;
             }

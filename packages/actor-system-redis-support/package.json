@@ -1,6 +1,6 @@
 {
   "name": "@yingyeothon/actor-system-redis-support",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "description": "The implementation of queue and lock to support actor-system.",
   "keywords": [
     "actor",
